@@ -1,0 +1,1658 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>《道德经》深解手绘连环画 · 一章一世界</title>
+<style>
+  :root{
+    color-scheme: light;
+    --bg:#FFFBF0;
+    --paper:#FFFFFF;
+    --ink:#2E2A22;
+    --muted:#8B8271;
+    --line:#3B362C;
+    --sun:#F2C230;
+    --sun-soft:#FCF0C4;
+    --sun-deep:#D9991A;
+    --mint:#DCEBDA;
+    --sky:#DBE7EF;
+    --rose:#F4DAD3;
+    --sand:#F0E8D6;
+
+    /* 手绘字体体系：Apple 手写体优先，其次行楷/楷体，最后衬线 */
+    --hand:"Microsoft YaHei","微软雅黑","PingFang SC","Noto Sans SC",sans-serif;
+    --display:"HanziPen SC","Hannotate SC","Xingkai SC","STXingkai","Kaiti SC","STKaiti","KaiTi","楷体","DFKai-SB","Noto Serif SC",serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:18px; -webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font:16px/1.95 var(--hand);
+    letter-spacing:.015em;
+  }
+  a{color:inherit;}
+
+  /* 章节视图隔离：点开任一章节，页面只剩该章 */
+  main:has(> section:target) > section:not(:target){display:none;}
+
+  /* ---------- 布局 ---------- */
+  .wrap{display:flex; align-items:flex-start;}
+  nav.toc{
+    position:sticky; top:0;
+    flex:0 0 300px; align-self:flex-start;
+    height:100vh; overflow-y:auto; overscroll-behavior:contain;
+    background:var(--sun-soft);
+    border-right:2.5px solid var(--line);
+  }
+  nav.toc .toc-top{
+    position:sticky; top:0; z-index:6;
+    padding:20px 52px 12px 18px;
+    background:var(--sun-soft);
+    border-bottom:2px dashed var(--line);
+  }
+  nav.toc .brand{
+    font-family:var(--display);
+    font-size:23px; font-weight:700; line-height:1.3; margin:0;
+  }
+  nav.toc .brand small{
+    display:block; font:800 11px/1.4 ui-sans-serif,system-ui,sans-serif;
+    letter-spacing:.16em; color:#6E6555; margin-top:7px;
+  }
+  nav.toc .toc-scroll{padding:12px 18px 18px;}
+  nav.toc .part{
+    font-family:var(--display);
+    font-size:14.5px; font-weight:700; letter-spacing:.08em;
+    color:var(--sun-deep); margin:14px 0 5px;
+  }
+  nav.toc .part:first-child{margin-top:2px;}
+  nav.toc a{
+    display:flex; gap:9px; align-items:baseline;
+    text-decoration:none; padding:6px 9px; margin:1px -9px;
+    font-family:var(--display);
+    font-size:17px; line-height:1.55; color:var(--ink);
+    border-radius:20px 6px 18px 6px/6px 18px 6px 20px;
+  }
+  nav.toc a:hover{background:#fff; box-shadow:inset 0 -.38em 0 var(--sun);}
+  nav.toc a .n{
+    flex:0 0 28px;
+    font:800 13.5px/1.7 ui-sans-serif,system-ui,sans-serif; color:#6E6555;
+  }
+  nav.toc a.core{
+    background:#fff; border:2.4px solid var(--line);
+    margin:8px -5px 10px; font-weight:700;
+  }
+
+  /* ---------- 侧栏收尾卡 ---------- */
+  .nav-foot{
+    position:sticky; bottom:0; z-index:6;
+    display:flex; gap:12px; align-items:flex-start;
+    padding:14px 18px 18px; border-top:2.5px solid var(--line);
+    background:#F7EBC4;
+  }
+  .nav-foot svg{flex:0 0 56px; width:56px; height:auto;}
+  .nav-foot p{
+    margin:0; font-family:var(--display);
+    font-size:15.5px; line-height:1.75; color:#4A4234; font-weight:600;
+  }
+  .nav-foot p b{
+    display:block; font-size:13px; color:var(--sun-deep);
+    letter-spacing:.08em; margin-top:5px;
+  }
+
+  /* ---------- 折叠 / 展开（纯 CSS，零 JS） ---------- */
+  .nav-check{position:fixed; opacity:0; width:1px; height:1px; pointer-events:none;}
+  nav.toc .nav-collapse{
+    position:absolute; top:18px; right:14px; cursor:pointer;
+    padding:1px 12px; background:var(--paper); color:var(--ink);
+    border:2.4px solid var(--line);
+    border-radius:18px 5px 16px 5px/5px 16px 5px 18px;
+    font-family:var(--display); font-size:18px; line-height:1.6;
+  }
+  nav.toc .nav-collapse:hover{box-shadow:inset 0 -.38em 0 var(--sun);}
+  .nav-float{
+    position:fixed; top:14px; left:14px; z-index:80;
+    display:none; align-items:center; gap:9px; cursor:pointer;
+    padding:10px 20px; background:var(--sun); color:var(--ink);
+    border:2.5px solid var(--line);
+    border-radius:24px 7px 22px 7px/7px 22px 7px 24px;
+    font-family:var(--display); font-size:18px; font-weight:700;
+  }
+  .nav-float:hover{box-shadow:inset 0 -.42em 0 var(--sun-deep);}
+  .nav-float .ic{font-size:20px; line-height:1;}
+  #navToggle:checked ~ .nav-float{display:flex;}
+  #navToggle:checked ~ .wrap > nav.toc{display:none;}
+  #navToggle:checked ~ .wrap > main{max-width:1140px;}
+
+  main{flex:1 1 auto; min-width:0; padding:30px clamp(16px,3.4vw,56px) 70px;}
+  section{max-width:960px; margin:0 auto 24px; scroll-margin-top:18px;}
+  section:target{padding-top:6px;}
+
+  /* ---------- 手绘边框 ---------- */
+  .doodle{
+    background:var(--paper);
+    border:2.5px solid var(--line);
+    border-radius:255px 15px 225px 15px/15px 225px 15px 255px;
+  }
+  .doodle.a{border-radius:15px 225px 15px 255px/225px 15px 255px 15px;}
+  .doodle.b{border-radius:255px 15px 225px 15px/15px 225px 15px 255px;}
+
+  /* ---------- 封面 ---------- */
+  .hero{padding:34px 32px 30px; margin-bottom:30px;}
+  .kicker{
+    display:inline-block; font-size:12px; letter-spacing:.18em;
+    background:var(--sun); border:2px solid var(--line); padding:3px 13px;
+    border-radius:20px 5px 18px 5px/5px 18px 5px 20px;
+    font-family:var(--display);
+  }
+  h1{
+    font-family:var(--display);
+    font-size:clamp(28px,4.6vw,46px); line-height:1.25; margin:16px 0 8px;
+  }
+  h1 em{font-style:normal; box-shadow:inset 0 -.34em 0 var(--sun); padding:0 6px;}
+  .sub{color:var(--muted); margin:0 0 22px; font-size:15px;}
+  .meta{display:flex; flex-wrap:wrap; gap:8px 10px; font-size:13px; color:var(--muted); margin-bottom:24px;}
+  .meta span{
+    background:var(--sand); border:1.8px solid var(--line); padding:2px 11px;
+    border-radius:14px 4px 14px 4px/4px 14px 4px 14px;
+  }
+
+  /* ---------- 目录卡（封面内） ---------- */
+  .index-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:13px; margin-top:14px;}
+  .index-grid a{
+    display:block; text-decoration:none;
+    background:var(--paper); border:2.4px solid var(--line);
+    border-radius:14px 60px 14px 60px/60px 14px 60px 14px;
+    padding:13px 15px;
+  }
+  .index-grid a:nth-child(2n){border-radius:60px 14px 60px 14px/14px 60px 14px 60px; background:var(--sun-soft);}
+  .index-grid a:nth-child(3n){background:var(--mint);}
+  .index-grid a:nth-child(5n){background:var(--sky);}
+  .index-grid a:hover{box-shadow:inset 0 -.42em 0 var(--sun);}
+  .index-grid b{
+    display:block; font-family:var(--display); font-size:16px; margin-bottom:3px;
+  }
+  .index-grid b i{
+    font-style:normal; font:700 11px/1.5 ui-sans-serif,system-ui,sans-serif;
+    color:var(--sun-deep); letter-spacing:.1em; margin-right:6px;
+  }
+  .index-grid span{font-size:13px; color:var(--muted); line-height:1.55;}
+
+  /* ---------- 章节头 ---------- */
+  .ch-head{display:flex; gap:15px; align-items:center; margin-bottom:16px;}
+  .ch-no{
+    flex:0 0 66px; height:66px; display:grid; place-items:center;
+    background:var(--sun); border:2.5px solid var(--line);
+    border-radius:52% 48% 55% 45%/48% 55% 45% 52%;
+    font-family:var(--display); font-size:26px;
+  }
+  .ch-head .part{
+    margin:0; font:700 11px/1.5 ui-sans-serif,system-ui,sans-serif;
+    letter-spacing:.14em; color:var(--sun-deep);
+  }
+  .ch-head h2{
+    margin:2px 0 0; font-family:var(--display);
+    font-size:clamp(21px,2.8vw,30px); line-height:1.3;
+  }
+  section:target > .ch-head h2{box-shadow:inset 0 -.38em 0 var(--sun);}
+
+  h3.block{
+    font-size:13px; letter-spacing:.16em; color:var(--muted); font-weight:700;
+    margin:26px 0 12px; display:flex; align-items:center; gap:10px;
+  }
+  h3.block::after{content:""; flex:1; border-top:2px dashed var(--line); opacity:.32;}
+
+  /* ---------- 中心思想 ---------- */
+  .idea{
+    padding:18px 24px; margin:0 0 22px;
+    background:var(--sun-soft); border:2.5px solid var(--line);
+    border-radius:8px 220px 12px 230px/220px 10px 230px 14px;
+  }
+  .idea h3{
+    margin:0 0 8px; font-size:12px; letter-spacing:.16em;
+    color:var(--sun-deep); font-weight:700;
+  }
+  .idea h3::before{content:"◆ ";}
+  .idea p{margin:0 0 10px; font-size:16.5px; line-height:1.95;}
+  .idea p:last-child{margin-bottom:0;}
+
+  /* ---------- 书里的故事 ---------- */
+  .story{
+    display:grid; grid-template-columns:132px 1fr; gap:18px; align-items:start;
+    padding:18px 22px; margin:0 0 22px;
+    background:var(--paper); border:2.5px solid var(--line);
+    border-radius:200px 14px 210px 16px/16px 210px 14px 200px;
+  }
+  .story .pic{
+    background:var(--sand); border:2.2px solid var(--line);
+    border-radius:14px 40px 14px 40px/40px 14px 40px 14px; padding:4px;
+  }
+  .story .pic svg{width:100%; height:auto; display:block;}
+  .story h3{
+    margin:0 0 8px; font-family:var(--display); font-size:17px; letter-spacing:.02em;
+  }
+  .story h3::before{content:"📖 ";}
+  .story p{margin:0 0 9px; font-size:15.5px; line-height:1.95;}
+  .story p:last-child{margin-bottom:0;}
+  .story .src{
+    display:block; margin-top:8px; font-size:12px; color:var(--muted);
+    border-top:2px dashed var(--line); padding-top:7px;
+  }
+
+  /* ---------- 连环画 ---------- */
+  .comic{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:0 0 22px;}
+  .comic.two{grid-template-columns:repeat(2,1fr);}
+  .panel{
+    margin:0; padding:0 0 11px; background:var(--paper);
+    border:2.5px solid var(--line);
+    border-radius:14px 220px 16px 230px/220px 16px 230px 14px;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .panel:nth-child(3n+2){border-radius:220px 14px 230px 16px/16px 230px 14px 220px;}
+  .panel:nth-child(3n+3){border-radius:230px 16px 210px 14px/16px 230px 14px 220px;}
+  .panel .scene{border-bottom:2.5px solid var(--line); padding:6px 6px 2px; background:var(--sand);}
+  .panel:nth-child(4n+1) .scene{background:var(--sun-soft);}
+  .panel:nth-child(4n+2) .scene{background:var(--sky);}
+  .panel:nth-child(4n+3) .scene{background:var(--mint);}
+  .panel:nth-child(4n+4) .scene{background:var(--rose);}
+  .panel svg{width:100%; height:116px; display:block;}
+  .bubble{
+    position:relative; margin:13px 13px 5px; padding:9px 11px;
+    background:var(--paper); border:2.2px solid var(--line);
+    border-radius:16px 16px 16px 3px;
+    font-size:14px; line-height:1.7;
+  }
+  .bubble::after{
+    content:""; position:absolute; left:19px; bottom:-8px;
+    width:13px; height:13px; background:var(--paper);
+    border-right:2.2px solid var(--line); border-bottom:2.2px solid var(--line);
+  }
+  .bubble b{color:var(--sun-deep);}
+  .panel .cap{
+    margin:auto 13px 0; padding-top:7px; border-top:2px dashed var(--line);
+    font-size:11.5px; color:var(--muted); letter-spacing:.03em;
+  }
+  .panel .cap::before{content:"▸ "; color:var(--sun-deep);}
+
+  /* ---------- 图解卡 ---------- */
+  .figure{
+    padding:20px 20px 13px; margin:0 0 22px;
+    background:var(--paper); border:2.5px solid var(--line);
+    border-radius:18px 200px 18px 210px/200px 18px 210px 18px;
+  }
+  .figure h4{
+    margin:0 0 3px; text-align:center;
+    font-family:var(--display); font-size:16px;
+  }
+  .figure .fcap{text-align:center; font-size:12.5px; color:var(--muted); margin:2px 0 13px;}
+  .figure svg{width:100%; height:auto; display:block;}
+
+  /* ---------- 正文段落 ---------- */
+  .prose p{margin:0 0 13px; font-size:15.8px; line-height:2.02;}
+  .prose p:last-child{margin-bottom:0;}
+  .prose b{box-shadow:inset 0 -.34em 0 var(--sun); font-weight:700;}
+  .prose .lead{font-size:17px;}
+
+  /* ---------- 误区 / 行动卡 ---------- */
+  .warn{
+    padding:16px 22px; margin:0 0 22px;
+    background:var(--rose); border:2.5px solid var(--line);
+    border-radius:60px 14px 60px 14px/14px 60px 14px 60px;
+  }
+  .warn h4{margin:0 0 8px; font-family:var(--display); font-size:16.5px;}
+  .warn h4::before{content:"⚠️ ";}
+  .warn ul{margin:0; padding-left:20px;}
+  .warn li{font-size:15px; line-height:1.9; margin-bottom:5px;}
+  .warn li:last-child{margin-bottom:0;}
+
+  .action{
+    padding:16px 22px; margin:0 0 22px;
+    background:var(--mint); border:2.5px solid var(--line);
+    border-radius:14px 60px 14px 60px/60px 14px 60px 14px;
+  }
+  .action h4{margin:0 0 8px; font-family:var(--display); font-size:16.5px;}
+  .action h4::before{content:"✅ ";}
+  .action ol{margin:0; padding-left:22px;}
+  .action li{font-size:15px; line-height:1.9; margin-bottom:5px;}
+  .action li:last-child{margin-bottom:0;}
+
+  /* ---------- 要点网格 ---------- */
+  .chips{display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:12px; margin:0 0 22px;}
+  .chip{
+    background:var(--paper); border:2.2px solid var(--line);
+    border-radius:14px 60px 14px 60px/60px 14px 60px 14px; padding:11px 14px;
+  }
+  .chip:nth-child(2n){background:var(--sun-soft); border-radius:60px 14px 60px 14px/14px 60px 14px 60px;}
+  .chip:nth-child(3n){background:var(--mint);}
+  .chip b{display:block; font-family:var(--display); font-size:15.5px; margin-bottom:2px;}
+  .chip b i{
+    font-style:normal; font:700 11px/1.5 ui-sans-serif,system-ui,sans-serif;
+    color:var(--sun-deep); letter-spacing:.08em; margin-left:5px;
+  }
+  .chip span{font-size:13px; color:var(--muted); line-height:1.6;}
+
+  /* ---------- 金句 ---------- */
+  .quote{
+    display:flex; gap:15px; align-items:flex-start;
+    padding:17px 23px; background:var(--paper);
+    border:2.5px solid var(--line); border-left:10px solid var(--sun-deep);
+    border-radius:6px 200px 8px 210px/200px 8px 210px 6px;
+  }
+  .quote .mark{
+    font-family:var(--display); font-size:38px; line-height:.9;
+    color:var(--sun-deep);
+  }
+  .quote p{margin:0; font-family:var(--display); font-size:18px; line-height:1.8;}
+  .quote cite{
+    display:block; margin-top:6px;
+    font:500 12px/1.5 ui-sans-serif,system-ui,sans-serif;
+    font-style:normal; color:var(--muted);
+  }
+
+  /* ---------- 章内翻页 ---------- */
+  .pager{
+    display:flex; gap:12px; justify-content:space-between; align-items:center;
+    margin-top:26px; padding-top:16px; border-top:2.5px solid var(--line);
+  }
+  .pager a{
+    text-decoration:none; padding:7px 16px;
+    background:var(--paper); border:2.2px solid var(--line);
+    border-radius:20px 6px 18px 6px/6px 18px 6px 20px;
+    font-family:var(--display); font-size:15px;
+  }
+  .pager a:hover{box-shadow:inset 0 -.42em 0 var(--sun);}
+  .pager a.up{background:var(--sun-soft);}
+
+  footer{
+    max-width:960px; margin:0 auto; padding:22px 0 0;
+    border-top:2.5px solid var(--line);
+    font-size:12.5px; color:var(--muted); line-height:1.9;
+  }
+
+  /* ---------- SVG 手绘基调 ---------- */
+  svg .st{fill:none; stroke:var(--line); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;}
+  svg .st-thin{fill:none; stroke:var(--line); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+  svg .st-hair{fill:none; stroke:var(--line); stroke-width:1.3; stroke-linecap:round; stroke-linejoin:round;}
+  svg .fill-y{fill:var(--sun); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-g{fill:var(--mint); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-b{fill:var(--sky); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-r{fill:var(--rose); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-w{fill:var(--paper); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-s{fill:var(--sand); stroke:var(--line); stroke-width:2.2;}
+  svg text{
+    font-family:"Microsoft YaHei","微软雅黑","PingFang SC",sans-serif;
+    fill:var(--ink);
+  }
+  svg .t{font-size:13px; font-weight:600;}
+  svg .ts{font-size:11px; fill:var(--muted);}
+  svg .tb{font-size:15px; font-weight:700;}
+  svg .ty{fill:var(--sun-deep); font-weight:700;}
+  svg .th{font-size:11.5px; font-weight:700; fill:var(--line);}
+
+  @media (max-width:900px){
+    .wrap{flex-direction:column;}
+    nav.toc{
+      position:static; flex:0 0 auto; width:100%; height:auto;
+      overflow:visible;
+      border-right:none; border-bottom:2.5px solid var(--line);
+    }
+    nav.toc .toc-top{position:static;}
+    .nav-foot{position:static;}
+    .nav-float{top:auto; bottom:16px; left:16px;}
+    .comic,.comic.two{grid-template-columns:1fr;}
+    .story{grid-template-columns:1fr;}
+    .story .pic{max-width:220px;}
+  }
+</style>
+</head>
+<body>
+<input type="checkbox" id="navToggle" class="nav-check" />
+<label class="nav-float" for="navToggle" title="展开目录"><span class="ic">☰</span><span>展开目录</span></label>
+<div class="wrap">
+
+<!-- ================= 左侧章节导航（可折叠） ================= -->
+<nav class="toc">
+  <div class="toc-top">
+    <p class="brand">道德经<small>TAO TE CHING · 老子</small></p>
+    <label class="nav-collapse" for="navToggle" title="收起目录">«</label>
+  </div>
+
+  <div class="toc-scroll">
+    <a class="core" href="#core"><span class="n">★</span><span>全书核心观念</span></a>
+
+    <p class="part">第一篇 · 道之体</p>
+    <a href="#ch1"><span class="n">01</span><span>道可道，非常道（第一章）</span></a>
+    <a href="#ch2"><span class="n">02</span><span>有物混成（第二十五章）</span></a>
+
+    <p class="part">第二篇 · 德之用</p>
+    <a href="#ch3"><span class="n">03</span><span>上善若水（第八章）</span></a>
+    <a href="#ch4"><span class="n">04</span><span>柔弱与不争（第七十六章）</span></a>
+
+    <p class="part">第三篇 · 修身之功</p>
+    <a href="#ch5"><span class="n">05</span><span>谷神不死，是谓玄牝（第六章）</span></a>
+    <a href="#ch6"><span class="n">06</span><span>致虚极，守静笃（第十六章）</span></a>
+    <a href="#ch7"><span class="n">07</span><span>为道日损（第四十八章）</span></a>
+
+    <p class="part">第四篇 · 治世之道</p>
+    <a href="#ch8"><span class="n">08</span><span>太上，不知有之（第十七章）</span></a>
+    <a href="#ch9"><span class="n">09</span><span>以正治国（第五十七章）</span></a>
+
+    <p class="part">结语</p>
+    <a href="#ending"><span class="n">终</span><span>信言不美（第八十一章）</span></a>
+  </div>
+
+  <div class="nav-foot">
+    <svg viewBox="0 0 60 60" role="img" aria-label="手绘太极与流水">
+      <circle cx="30" cy="30" r="22" class="fill-w"/>
+      <path d="M30 8 C42 14 42 24 30 30 C18 36 18 46 30 52" class="st"/>
+      <circle cx="30" cy="19" r="3.2" class="fill-w"/>
+      <circle cx="30" cy="41" r="3.2" class="fill-y"/>
+    </svg>
+    <p>道可道，非常道。<b>—— 全书开卷第一句</b></p>
+  </div>
+</nav>
+
+<main>
+
+<!-- ================= 封面 + 全书目录 ================= -->
+<section class="hero doodle" id="top">
+  <span class="kicker">手绘连环画 · 一章一世界</span>
+  <h1>《道德经》深解<br><em>一部关于「道与德」的八十一章手绘笔记</em></h1>
+  <p class="sub">老子 著 · 春秋 · 五千言 · 通行本八十一章（《道经》三十七章 + 《德经》四十四章）</p>
+  <div class="meta">
+    <span>9 章精选 · 四篇</span><span>原文 + 字诂 + 义理 + 今用</span><span>手绘图 50+ 幅</span><span>每章独立成篇</span>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>道可道，非常道；名可名，非常名。无名，天地之始；有名，万物之母。
+      <cite>—— 通行本第一章</cite></p>
+  </div>
+
+  <h3 class="block">怎么用这个页面</h3>
+  <div class="prose">
+    <p class="lead">这不是一篇从头读到尾的长文，是一份<b>可以反复回来翻的手绘笔记</b>。左侧是章目，点开任何一章，页面就<b>只显示那一章</b>——不被前后内容干扰，随时可以只读一块。</p>
+    <p>全书五千言、八十一章，本页不逐章铺陈，而是择其枢纽，按<b>道之体 → 德之用 → 修身之功 → 治世之道</b>四篇九章展开。每章的结构是固定的：<b>原文</b>（通行本原文）、<b>字义疏解</b>（训诂关键字词）、<b>义理阐发</b>（这一章究竟在说什么）、<b>连环画</b>（意象图解）、<b>今用</b>（在今天如何理解与践行）。</p>
+    <p>行文力求<b>典雅而不艰深</b>：原文照录，解释用规范书面语，不作戏言，不落俗套；遇到古今异义的关键字（如「谷」「堇」「玄牝」），逐一辨明，务使读者不仅知其然，亦知其所以然。</p>
+    <p>⚠️ 本页解析为<b>原创义理阐发</b>，原文据王弼通行本；历代注家（河上公、王弼、陈鼓应等）各有胜义，此处取其通达，不拘一说。欲深研，请参校注疏原典。</p>
+  </div>
+
+  <h3 class="block">点开任何一章，就是一整个世界</h3>
+  <div class="index-grid">
+    <a href="#core"><b><i>★</i>全书核心观念</b><span>道 · 德 · 无为 · 自然：四个总纲</span></a>
+    <a href="#ch1"><b><i>01</i>道可道，非常道</b><span>语言的边界与道的全体</span></a>
+    <a href="#ch2"><b><i>02</i>有物混成</b><span>道的面貌：先天地生，独立不改</span></a>
+    <a href="#ch3"><b><i>03</i>上善若水</b><span>七善之德：处下而不争</span></a>
+    <a href="#ch4"><b><i>04</i>柔弱与不争</b><span>柔弱者生之徒，坚强者死之徒</span></a>
+    <a href="#ch5"><b><i>05</i>谷神不死</b><span>玄牝之门：虚而能应，绵绵若存</span></a>
+    <a href="#ch6"><b><i>06</i>致虚极，守静笃</b><span>归根复命：观复的功夫</span></a>
+    <a href="#ch7"><b><i>07</i>为道日损</b><span>减法的智慧：损之又损，以至于无为</span></a>
+    <a href="#ch8"><b><i>08</i>太上，不知有之</b><span>四种治理境界</span></a>
+    <a href="#ch9"><b><i>09</i>以正治国</b><span>我无为而民自化</span></a>
+    <a href="#ending"><b><i>终</i>信言不美</b><span>全书收束：利而不害，为而不争</span></a>
+  </div>
+</section>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3B362C"/></marker>
+  <marker id="ary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#D9991A"/></marker>
+  <marker id="arm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#8B8271"/></marker>
+</defs></svg>
+
+<!-- ================= ★ 全书核心观念 ================= -->
+<section id="core">
+  <div class="ch-head">
+    <div class="ch-no">★</div>
+    <div>
+      <p class="part">THE CORE IDEA · 全书核心观念</p>
+      <h2>道 · 德 · 无为 · 自然：四个总纲</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>《道德经》五千言，看似散漫，实则纲举目张。全书只围绕四个字展开：<b>道</b>是宇宙万物的本源与法则，无形无名，却运化不息；<b>德</b>是道在人身与万物中的落实，「德者，得也」，得道之谓德；<b>无为</b>是顺应道的行为方式，不妄作、不强取、不逆物之性；<b>自然</b>是道呈现的状态，「自己如此」，非外力所强。</p>
+    <p>四者的关系可以一言蔽之：<b>人法地，地法天，天法道，道法自然</b>（第二十五章）。一切修养与治世，最终都是把「人为」的成分一层层剥去，让事物回到它本有的样子。这也是「为道日损」一语的深意所在。</p>
+  </div>
+
+  <h3 class="block">主视觉 · 人法地，地法天，天法道，道法自然</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 280" role="img" aria-label="人法地地法天天法道道法自然的层级图">
+      <rect x="40" y="180" width="150" height="70" rx="12" class="fill-s"/>
+      <text x="115" y="212" class="tb" text-anchor="middle">人</text>
+      <text x="115" y="236" class="ts" text-anchor="middle">当效法于地</text>
+      <rect x="230" y="150" width="150" height="70" rx="12" class="fill-g"/>
+      <text x="305" y="182" class="tb" text-anchor="middle">地</text>
+      <text x="305" y="206" class="ts" text-anchor="middle">当效法于天</text>
+      <rect x="420" y="120" width="150" height="70" rx="12" class="fill-b"/>
+      <text x="495" y="152" class="tb" text-anchor="middle">天</text>
+      <text x="495" y="176" class="ts" text-anchor="middle">当效法于道</text>
+      <rect x="610" y="90" width="150" height="70" rx="12" class="fill-y"/>
+      <text x="685" y="122" class="tb" text-anchor="middle">道</text>
+      <text x="685" y="146" class="ts" text-anchor="middle">当效法自然</text>
+      <path d="M195 215 L222 192" class="st" marker-end="url(#ar)"/>
+      <path d="M385 185 L412 162" class="st" marker-end="url(#ar)"/>
+      <path d="M575 155 L602 132" class="st" marker-end="url(#ar)"/>
+      <text x="790" y="70" class="ty">自然</text>
+      <text x="790" y="94" class="ts">自己如此</text>
+      <text x="790" y="112" class="ts">非他力所强</text>
+      <path d="M762 110 L778 96" class="st-thin"/>
+    </svg>
+  </div>
+
+  <h3 class="block">图解 · 全书结构：《道经》与《德经》</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 260" role="img" aria-label="道德经全书结构：道经三十七章与德经四十四章">
+      <rect x="50" y="60" width="360" height="140" rx="14" class="fill-b"/>
+      <text x="230" y="105" class="tb" text-anchor="middle">《道经》一至三十七章</text>
+      <text x="230" y="140" class="t" text-anchor="middle">论道之体：本源、法则、无名</text>
+      <text x="230" y="172" class="ts" text-anchor="middle">「道可道，非常道」立其纲</text>
+      <rect x="470" y="60" width="380" height="140" rx="14" class="fill-g"/>
+      <text x="660" y="105" class="tb" text-anchor="middle">《德经》三十八至八十一章</text>
+      <text x="660" y="140" class="t" text-anchor="middle">论德之用：修身、处世、治国</text>
+      <text x="660" y="172" class="ts" text-anchor="middle">「上德不德，是以有德」承其绪</text>
+      <path d="M420 130 L458 130" class="st" marker-end="url(#ar)"/>
+      <text x="450" y="236" class="ts" text-anchor="middle">体用一源：道为体，德为用；论道必归于人事，论德必溯于天道</text>
+    </svg>
+  </div>
+
+  <h3 class="block">概念拆解 · 四个总纲</h3>
+  <div class="chips">
+    <div class="chip"><b>道<i>DAO</i></b><span>先天地生，独立不改。万物由之而出，而它自己不居功、不主宰。</span></div>
+    <div class="chip"><b>德<i>DE</i></b><span>道之在物者。道是普遍的法则，德是此物此人的所得与禀赋。</span></div>
+    <div class="chip"><b>无为<i>WU-WEI</i></b><span>非不作为，乃不妄为：因物之性，顺时之势，不多加一手。</span></div>
+    <div class="chip"><b>自然<i>ZI-RAN</i></b><span>「自己如此」之谓。道之外别无所法，一切回归本然。</span></div>
+    <div class="chip"><b>反<i>RETURN</i></b><span>「反者道之动」——物极必反，循环往复，是道运动的总方向。</span></div>
+    <div class="chip"><b>柔<i>SOFT</i></b><span>「柔弱胜刚强」——水、婴儿、谷，皆以虚柔而能久能生。</span></div>
+  </div>
+
+  <h3 class="block">阅读前的三个提醒</h3>
+  <div class="warn">
+    <h4>常见误读，先行辨明</h4>
+    <ul>
+      <li><b>「无为」不是躺平</b>：老子屡言「为无为，则无不治」，是「不妄为」而非「不作为」，其效验恰在「无不为」。</li>
+      <li><b>「不争」不是退让</b>：「夫唯不争，故天下莫能与之争」，是不争于私、不争于一时，而非放弃担当。</li>
+      <li><b>「道」不是神</b>：道无形无名、自然无意志，非人格神祇，勿以宗教神灵视之。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch1">01 · 道可道，非常道 →</a>
+  </div>
+</section>
+
+<!-- ================= 01 道可道 ================= -->
+<section id="ch1">
+  <div class="ch-head">
+    <div class="ch-no">01</div>
+    <div>
+      <p class="part">CHAPTER 01 · 第一篇 · 道之体</p>
+      <h2>道可道，非常道</h2>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>道可道，非常道；名可名，非常名。无名，天地之始；有名，万物之母。故常无欲，以观其妙；常有欲，以观其徼。此两者，同出而异名，同谓之玄。玄之又玄，众妙之门。
+      <cite>—— 通行本第一章</cite></p>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>开卷第一章立的是全书的总纲：<b>道不可被语言穷尽</b>。「可道」的道，是可以说清、可以定义的道；「常道」则是永恒的、全体的道。一经言说，便已落在片段之中，如同以网取水，所得非水之全。</p>
+    <p>紧接着提出「无名」与「有名」一对范畴：天地未分之时，无形无名，是为<b>天地之始</b>；万物既生，各有名称、各有分别，是为<b>万物之母</b>。观道有两个角度——自「无」观其<b>妙</b>（幽深的生机），自有观其<b>徼</b>（可见的边际）。两者同出于道，不过角度不同。老子说，把这两重角度再往深处推，「玄之又玄」，便是通向一切奥妙的门径。</p>
+  </div>
+
+  <h3 class="block">连环画 · 说得出的与说不出的</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="以指指月，指非月">
+        <circle cx="116" cy="30" r="14" class="fill-y"/>
+        <path d="M22 100 L54 66" class="st"/>
+        <path d="M54 66 L70 48" class="st-thin"/>
+        <path d="M70 48 L92 38" class="st-thin" stroke-dasharray="4 4"/>
+        <text x="26" y="60" class="ts">言</text>
+      </svg></div>
+      <p class="bubble">语言如同指月之指——<b>可指其方向，不可得其全体</b>。</p>
+      <p class="cap">道可道，非常道</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="混沌未分的圆">
+        <circle cx="80" cy="58" r="34" class="fill-b"/>
+        <path d="M60 40 C74 52 66 68 80 78" class="st-hair"/>
+        <text x="80" y="20" class="ts" text-anchor="middle">无名 · 天地之始</text>
+        <text x="80" y="110" class="ts" text-anchor="middle">未分、无形、无名</text>
+      </svg></div>
+      <p class="bubble">未有名称之前，天地只是<b>浑然的一</b>——无分别，故无亏欠。</p>
+      <p class="cap">无名，天地之始</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="万物各具名称">
+        <circle cx="40" cy="42" r="12" class="fill-g"/>
+        <circle cx="92" cy="34" r="12" class="fill-y"/>
+        <circle cx="124" cy="72" r="12" class="fill-r"/>
+        <circle cx="60" cy="84" r="12" class="fill-b"/>
+        <path d="M80 58 L80 58" class="st-hair"/>
+        <text x="40" y="47" class="ts" text-anchor="middle">木</text>
+        <text x="92" y="39" class="ts" text-anchor="middle">火</text>
+        <text x="124" y="77" class="ts" text-anchor="middle">土</text>
+        <text x="60" y="89" class="ts" text-anchor="middle">水</text>
+        <text x="80" y="112" class="ts" text-anchor="middle">有名 · 万物之母</text>
+      </svg></div>
+      <p class="bubble">一经命名，万物<b>各得其位、各成其形</b>——世界自此展开。</p>
+      <p class="cap">有名，万物之母</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="两扇门：观妙与观徼">
+        <rect x="24" y="30" width="46" height="66" rx="22" class="fill-b"/>
+        <rect x="90" y="30" width="46" height="66" rx="22" class="fill-g"/>
+        <text x="47" y="60" class="t" text-anchor="middle">妙</text>
+        <text x="113" y="60" class="t" text-anchor="middle">徼</text>
+        <path d="M70 63 L90 63" class="st-hair"/>
+        <text x="80" y="110" class="ts" text-anchor="middle">同出而异名 · 同谓之玄</text>
+      </svg></div>
+      <p class="bubble">自「无」观其生机之幽深，自「有」观其形器之边际。<b>两扇门，通向同一座庭院</b>。</p>
+      <p class="cap">玄之又玄，众妙之门</p>
+    </figure>
+  </div>
+
+  <h3 class="block">字义疏解 · 三个关键字</h3>
+  <div class="chips">
+    <div class="chip"><b>常<i>CHANG</i></b><span>恒常、永恒。帛书本作「恒」，指超越一时一象的本来之道。</span></div>
+    <div class="chip"><b>妙<i>MIAO</i></b><span>幽深难测之生机。自「无」处观，故见其深微。</span></div>
+    <div class="chip"><b>徼<i>JIAO</i></b><span>边界、端倪。自「有」处观，故见其形迹与分际。</span></div>
+    <div class="chip"><b>玄<i>XUAN</i></b><span>幽远而不可测。非神秘主义，是说「深一层再深一层」。</span></div>
+    <div class="chip"><b>观<i>GUAN</i></b><span>非肉眼之看，乃静照默察的工夫，与后文「致虚守静」相贯。</span></div>
+    <div class="chip"><b>门<i>MEN</i></b><span>出入之径。「众妙之门」即通达一切深妙的总入口。</span></div>
+  </div>
+
+  <h3 class="block">义理阐发 · 为什么第一章如此要紧</h3>
+  <div class="prose">
+    <p class="lead">老子开篇即与「名」作战，用意极深。春秋之际，名实之辩已起，人人以为<b>说得出便算懂得</b>。老子却指出：凡能被概念固定的，都只是道的一个切面；执定切面为全体，正是后世一切偏执的根源。</p>
+    <p>这并不意味着道不可知，而是说<b>知的方式要换</b>：不靠概念的捕捉，而靠「观」——在虚静中默照，在无欲与有欲之间往返。此即全书功夫论的种子，后文「致虚极，守静笃」正是这一「观」字的展开。</p>
+    <p>「无名」「有名」也不是两截：无名是<b>未分化</b>的整全，有名是<b>已分化</b>的万有。道在两者之间运行不已。明乎此，则知老子既不弃世（不废「有名」之用），亦不执世（不舍「无名」之本）。</p>
+  </div>
+
+  <h3 class="block">今用 · 这一章给现代人的三把钥匙</h3>
+  <div class="action">
+    <h4>把「观」字用起来</h4>
+    <ol>
+      <li><b>慎言</b>：重要之事，先默观而后言。言语定型过早，事物的其余面向即被遮蔽。</li>
+      <li><b>悬置判断</b>：遇人遇事先不命名（「他是那样的人」），保留「无名」的余地，见其本来。</li>
+      <li><b>双重视角</b>：做决策既观其「妙」（长远的生机），亦观其「徼」（现实的边界），二者兼看，方为周全。</li>
+    </ol>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch2">02 · 有物混成 →</a>
+  </div>
+</section>
+
+<!-- ================= 02 有物混成 ================= -->
+<section id="ch2">
+  <div class="ch-head">
+    <div class="ch-no">02</div>
+    <div>
+      <p class="part">CHAPTER 02 · 第一篇 · 道之体</p>
+      <h2>有物混成，先天地生</h2>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>有物混成，先天地生。寂兮寥兮，独立而不改，周行而不殆，可以为天下母。吾不知其名，强字之曰道，强为之名曰大。大曰逝，逝曰远，远曰反。故道大，天大，地大，人亦大。域中有四大，而人居其一焉。人法地，地法天，天法道，道法自然。
+      <cite>—— 通行本第二十五章</cite></p>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>第一章说「道」不可名，这一章老子却不得不给它一个勉强的称呼：<b>「强字之曰道」</b>。「强」字极有分寸——不是定义，是不得已的权称。道的面貌于此章和盘托出：<b>先天地生</b>（时间上在先）、<b>独立而不改</b>（不依赖外物而恒常）、<b>周行而不殆</b>（循环运行而永不止息）。</p>
+    <p>道的运动方式是<b>大 → 逝 → 远 → 反</b>：广布流行，行之愈远，终归回返。「反者道之动」（第四十章）在此得到形象的表述。<b>「反」字是全书的枢纽</b>——一切发展到极处必回转，故守柔、守下、守不盈，皆自此推出。</p>
+  </div>
+
+  <h3 class="block">连环画 · 道的一次周行</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="混沌之物先于天地">
+        <ellipse cx="80" cy="58" rx="40" ry="28" class="fill-b"/>
+        <path d="M52 48 C66 42 94 42 108 50" class="st-hair"/>
+        <path d="M48 100 L112 100" class="st-hair"/>
+        <text x="80" y="20" class="ts" text-anchor="middle">天地未生，此物已存</text>
+      </svg></div>
+      <p class="bubble">「有物混成」——浑然一体，<b>未有天地之先，它已在</b>。</p>
+      <p class="cap">先天地生</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="独立的树不依傍他物">
+        <path d="M80 100 L80 44" class="st"/>
+        <path d="M80 66 L58 48 M80 58 L102 42 M80 78 L62 70" class="st-thin"/>
+        <circle cx="80" cy="34" r="16" class="fill-g"/>
+        <path d="M30 100 L130 100" class="st-hair"/>
+        <text x="80" y="114" class="ts" text-anchor="middle">独立而不改 · 不待于外</text>
+      </svg></div>
+      <p class="bubble">「独立而不改」——<b>不依傍任何外物</b>，故不随外物而变。</p>
+      <p class="cap">独立而不改</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="四季循环的圆环">
+        <circle cx="80" cy="58" r="34" class="fill-w"/>
+        <path d="M80 24 A34 34 0 0 1 112 50" class="st" marker-end="url(#ar)"/>
+        <text x="80" y="16" class="ts" text-anchor="middle">春</text>
+        <text x="128" y="58" class="ts">夏</text>
+        <text x="80" y="108" class="ts" text-anchor="middle">秋</text>
+        <text x="32" y="58" class="ts">冬</text>
+        <text x="80" y="63" class="t" text-anchor="middle">周行</text>
+      </svg></div>
+      <p class="bubble">「周行而不殆」——运行如四季之循环，<b>终而复始，永无倦怠</b>。</p>
+      <p class="cap">周行而不殆</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="大逝远反的回环箭头">
+        <path d="M30 88 C30 40 70 22 100 22 C130 22 142 46 130 64 C118 82 86 84 62 76" class="st" marker-end="url(#ar)"/>
+        <text x="30" y="104" class="ts">大</text>
+        <text x="82" y="16" class="ts">逝</text>
+        <text x="140" y="42" class="ts">远</text>
+        <text x="76" y="96" class="ty">反</text>
+      </svg></div>
+      <p class="bubble">「大曰逝，逝曰远，远曰反」——<b>行得再远，终要回到来处</b>。</p>
+      <p class="cap">远曰反 · 全书枢纽</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 域中四大与效法的阶梯</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 240" role="img" aria-label="道大天大地大人亦大四大并列">
+      <rect x="60" y="70" width="170" height="100" rx="14" class="fill-y"/>
+      <text x="145" y="112" class="tb" text-anchor="middle">道 · 大</text>
+      <text x="145" y="142" class="ts" text-anchor="middle">自然 · 无所法</text>
+      <rect x="265" y="70" width="170" height="100" rx="14" class="fill-b"/>
+      <text x="350" y="112" class="tb" text-anchor="middle">天 · 大</text>
+      <text x="350" y="142" class="ts" text-anchor="middle">法道</text>
+      <rect x="470" y="70" width="170" height="100" rx="14" class="fill-g"/>
+      <text x="555" y="112" class="tb" text-anchor="middle">地 · 大</text>
+      <text x="555" y="142" class="ts" text-anchor="middle">法天</text>
+      <rect x="675" y="70" width="170" height="100" rx="14" class="fill-r"/>
+      <text x="760" y="112" class="tb" text-anchor="middle">人 · 大</text>
+      <text x="760" y="142" class="ts" text-anchor="middle">法地</text>
+      <text x="450" y="212" class="ts" text-anchor="middle">人列于「四大」之中，老子视人为天地间一可大之物——非万物之主，乃万物之一</text>
+    </svg>
+  </div>
+
+  <h3 class="block">义理阐发 · 「道法自然」不是「道效法大自然」</h3>
+  <div class="prose">
+    <p class="lead">此处最易误解的是末句。「自然」在老子书中<b>不是一个名词，而是一个状态词</b>：「自己如此」，即本来的样子。故「道法自然」意为：<b>道所效法的，是它自己的本然</b>——道之上再无所法，一切到此为止。</p>
+    <p>「人法地，地法天，天法道，道法自然」构成一个递归的阶梯：人当如地之厚重承载，地当如天之覆盖无偏，天当如道之运行不息，而道则回归本然、不加造作。<b>人的修养，就是把「人为」一层层减去</b>，与第三篇「为道日损」遥相呼应。</p>
+    <p>又，「域中有四大，人居其一」一语，为人在宇宙中安放了一个<b>庄重而谦卑</b>的位置：人与道、天、地并列为「大」，是说人能参赞化育；但人只居「其一」，是说人不可自居为主宰。老子的人文主义，是一种<b>有敬畏的人文主义</b>。</p>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>反者道之动，弱者道之用。</p>
+    <cite>—— 通行本第四十章 · 与本章「远曰反」互参</cite>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch3">03 · 上善若水 →</a>
+  </div>
+</section>
+
+<!-- ================= 03 上善若水 ================= -->
+<section id="ch3">
+  <div class="ch-head">
+    <div class="ch-no">03</div>
+    <div>
+      <p class="part">CHAPTER 03 · 第二篇 · 德之用</p>
+      <h2>上善若水</h2>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>上善若水。水善利万物而不争，处众人之所恶，故几于道。居善地，心善渊，与善仁，言善信，政善治，事善能，动善时。夫唯不争，故无尤。
+      <cite>—— 通行本第八章</cite></p>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>「道」难以言说，老子便取一物作象：<b>水</b>。水有三重德性最契于道：<b>利万物</b>（滋养众生而无所偏私）、<b>不争</b>（不与物争高下）、<b>处众人之所恶</b>（安于低下之地——人之所恶者，卑湿垢浊，水独安之）。正因这三者，「故几于道」——<b>水是「近道」之物，而非道本身</b>。</p>
+    <p>随后的七「善」，是水德在人事上的展开：居处贵谦下（<b>善地</b>），心念贵深静（<b>善渊</b>），待人贵真诚（<b>善仁</b>），言语贵信实（<b>善信</b>），为政贵清明（<b>善治</b>），处事贵胜任（<b>善能</b>），行动贵合时（<b>善时</b>）。七者皆备而<b>始终不争</b>，故能「无尤」——没有怨咎。</p>
+  </div>
+
+  <h3 class="block">连环画 · 水的四幕</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="雨水滋润万物">
+        <path d="M40 18 C34 26 34 34 40 40 C46 34 46 26 40 18 Z" class="fill-b"/>
+        <path d="M80 12 C72 22 72 34 80 42 C88 34 88 22 80 12 Z" class="fill-b"/>
+        <path d="M120 18 C114 26 114 34 120 40 C126 34 126 26 120 18 Z" class="fill-b"/>
+        <path d="M24 96 C24 78 44 70 60 70 C76 70 96 78 96 96" class="fill-g"/>
+        <path d="M104 96 C104 82 116 76 128 76 C140 76 150 84 150 96" class="fill-g"/>
+        <text x="80" y="110" class="ts" text-anchor="middle">善利万物</text>
+      </svg></div>
+      <p class="bubble">雨落三亩，<b>不拣苗之贵贱</b>——利养之功，本无偏私。</p>
+      <p class="cap">水善利万物</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="水就下，处低处">
+        <path d="M14 28 L146 28" class="st-hair" stroke-dasharray="4 4"/>
+        <path d="M20 36 L60 72 L100 72 L140 40" class="st"/>
+        <path d="M40 72 C40 82 56 86 80 86 C104 86 120 82 120 72" class="fill-b"/>
+        <text x="80" y="30" class="ts" text-anchor="middle">众人之所好</text>
+        <text x="80" y="104" class="ts" text-anchor="middle">处众人之所恶 · 就下而不辞</text>
+      </svg></div>
+      <p class="bubble">水趋卑湿之地，<b>安于人之所恶</b>——这正是它近道之处。</p>
+      <p class="cap">处众人之所恶</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="水随器成形">
+        <path d="M34 96 L34 64 C34 50 50 46 56 56 L62 66 C66 74 78 74 82 66 L88 56 C94 46 110 50 110 64 L110 96 Z" class="fill-w"/>
+        <path d="M38 84 C52 78 92 78 106 84 L106 94 L38 94 Z" class="fill-b"/>
+        <text x="72" y="112" class="ts" text-anchor="middle">随物赋形 · 不失其性</text>
+      </svg></div>
+      <p class="bubble">方圆随器而形变，<b>而润下之性不改</b>——变的是姿态，不变的是本分。</p>
+      <p class="cap">事善能 · 动善时</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="滴水穿石">
+        <ellipse cx="80" cy="24" rx="4" ry="8" class="fill-b"/>
+        <path d="M80 36 L80 52" class="st-hair"/>
+        <rect x="44" y="72" width="72" height="26" rx="4" class="fill-s"/>
+        <path d="M80 52 L80 74" class="st-hair"/>
+        <ellipse cx="80" cy="72" rx="8" ry="3" class="fill-b"/>
+        <text x="80" y="112" class="ts" text-anchor="middle">天下莫柔弱于水，而攻坚强者莫之能胜</text>
+      </svg></div>
+      <p class="bubble">日久年深，<b>至柔能穿至坚</b>——不争一时，故能成其久。</p>
+      <p class="cap">夫唯不争，故无尤</p>
+    </figure>
+  </div>
+
+  <h3 class="block">字义疏解 · 七善略释</h3>
+  <div class="chips">
+    <div class="chip"><b>居善地<i>1</i></b><span>择地而居，贵在谦下不争之地，非谓择肥而处。</span></div>
+    <div class="chip"><b>心善渊<i>2</i></b><span>心如深渊，静定而澄澈，不为外境所动。</span></div>
+    <div class="chip"><b>与善仁<i>3</i></b><span>「与」即交往。待人以仁，如水之润物无偏。</span></div>
+    <div class="chip"><b>言善信<i>4</i></b><span>水有潮信，言语贵在真实不虚。</span></div>
+    <div class="chip"><b>政善治<i>5</i></b><span>为政清明，如水之洗垢使净。</span></div>
+    <div class="chip"><b>事善能<i>6</i></b><span>处事各当其能，如水之随物赋形、无往不达。</span></div>
+    <div class="chip"><b>动善时<i>7</i></b><span>行动应时，如水之春涨秋落，不失其候。</span></div>
+    <div class="chip"><b>无尤<i>结</i></b><span>尤，怨咎也。不与物争，故无人怨之。</span></div>
+  </div>
+
+  <h3 class="block">义理阐发 · 为什么是「水」而不是别的</h3>
+  <div class="prose">
+    <p class="lead">老子取象于水，是因为水在日常可见之物中<b>最完整地演示了「道」的运作方式</b>：道生万物而不为主（水润万物而不有），道处卑而不辞（水就下而不恶），道以柔弱为用（水至柔而克刚）。但老子措辞极有分寸——「<b>几</b>于道」，是「接近」而非「等于」。象终究是象，执象失道，则又落入第一章所破的「名」障。</p>
+    <p>「不争」二字尤须善看。不争<b>非不为</b>：水无一时不流、无一处不润，它的「为」是<b>成就性的为</b>——利泽施于物而形迹不居。这与「无为」同义：<b>为而不恃，功成而弗居</b>（第二章）。争，则有对；有对，则有败有尤。不争，故莫之能争。</p>
+    <p>七「善」的排列亦见匠心：<b>自处（居、心）→ 待人（与、言）→ 应事（政、事、动）</b>，由内而外，由体而用，恰是一部完整的「水德」修养手册。</p>
+  </div>
+
+  <h3 class="block">今用 · 水德三则</h3>
+  <div class="action">
+    <h4>把「水」带进日常</h4>
+    <ol>
+      <li><b>处下</b>：合作中先成就他人之功，看似吃亏，实则聚人——「善地」之义。</li>
+      <li><b>赋形</b>：环境变化时先适应、后影响，守住核心能力（润下之性）而灵活姿态。</li>
+      <li><b>持久</b>：以十年为单位做正确的小事，如水之穿石——「不争一时，故能成其久」。</li>
+    </ol>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch4">04 · 柔弱与不争 →</a>
+  </div>
+</section>
+
+<!-- ================= 04 柔弱与不争 ================= -->
+<section id="ch4">
+  <div class="ch-head">
+    <div class="ch-no">04</div>
+    <div>
+      <p class="part">CHAPTER 04 · 第二篇 · 德之用</p>
+      <h2>柔弱者生之徒</h2>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>人之生也柔弱，其死也坚强。草木之生也柔脆，其死也枯槁。故坚强者死之徒，柔弱者生之徒。是以兵强则灭，木强则折。强大处下，柔弱处上。
+      <cite>—— 通行本第七十六章</cite></p>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>老子从最平常的观察入手：<b>活着的身体是柔软的，死后才僵硬；活着的草木是柔脆的，死后才枯槁</b>。由此推出一条普遍法则——<b>柔弱属于「生」的一类，坚强属于「死」的一类</b>。这不是道德劝喻，而是对生命状态的经验归纳。</p>
+    <p>推及人事：兵力逞强则招灭，树木强硬则易折。<b>越是处于强大地位，越要懂得居下；越是保持柔弱，反而居于上游</b>。与第八章「不争」合观，可知老子的「柔」不是软弱可欺，而是<b>生机、韧性与余地</b>。</p>
+  </div>
+
+  <h3 class="block">连环画 · 柔与坚的对照</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="活树枝条柔韧">
+        <path d="M80 100 L80 56" class="st"/>
+        <path d="M80 72 C62 62 52 46 48 30" class="st-thin"/>
+        <path d="M80 62 C98 54 110 40 116 26" class="st-thin"/>
+        <circle cx="46" cy="26" r="10" class="fill-g"/>
+        <circle cx="118" cy="22" r="10" class="fill-g"/>
+        <circle cx="80" cy="46" r="12" class="fill-g"/>
+        <path d="M30 100 L130 100" class="st-hair"/>
+      </svg></div>
+      <p class="bubble">生也柔脆——<b>枝条能弯，是活的证据</b>。</p>
+      <p class="cap">柔弱者，生之徒</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="枯枝折断">
+        <path d="M80 100 L80 62" class="st"/>
+        <path d="M80 72 L58 52" class="st-thin"/>
+        <path d="M80 62 L104 44" class="st-thin"/>
+        <path d="M104 44 L112 34 M104 44 L116 48" class="st-hair"/>
+        <path d="M30 100 L130 100" class="st-hair"/>
+        <text x="80" y="26" class="ts" text-anchor="middle">折</text>
+      </svg></div>
+      <p class="bubble">死也枯槁——<b>不能弯的，先断</b>。</p>
+      <p class="cap">坚强者，死之徒</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="风中竹与断木">
+        <path d="M44 100 C44 70 40 52 32 36" class="st"/>
+        <path d="M40 76 L26 66 M42 60 L56 50" class="st-thin"/>
+        <path d="M116 100 L116 58" class="st"/>
+        <path d="M116 64 L100 50 M116 56 L132 44" class="st-thin"/>
+        <path d="M116 58 L110 46" class="st-hair"/>
+        <path d="M60 26 C74 20 92 20 106 26" class="st-hair" stroke-dasharray="4 4"/>
+        <text x="80" y="18" class="ts" text-anchor="middle">风</text>
+      </svg></div>
+      <p class="bubble">风过：<b>竹弯而复起，树直而先摧</b>。</p>
+      <p class="cap">木强则折</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="水滴与秤：柔弱处上">
+        <path d="M80 24 C72 36 66 46 66 54 A14 14 0 0 0 94 54 C94 46 88 36 80 24 Z" class="fill-b"/>
+        <path d="M30 86 L130 86" class="st"/>
+        <path d="M80 70 L80 86" class="st-thin"/>
+        <path d="M40 86 L56 76 M120 86 L104 76" class="st-hair"/>
+        <text x="80" y="106" class="ty" text-anchor="middle">柔弱处上</text>
+      </svg></div>
+      <p class="bubble">秤杆之上，<b>轻者高，重者下</b>——强大处下，柔弱处上。</p>
+      <p class="cap">强大处下，柔弱处上</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 柔弱的三层含义</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 240" role="img" aria-label="柔弱包含生机韧性余地三层含义">
+      <rect x="50" y="60" width="230" height="110" rx="14" class="fill-g"/>
+      <text x="165" y="102" class="tb" text-anchor="middle">生机</text>
+      <text x="165" y="134" class="ts" text-anchor="middle">柔软 = 活力未失</text>
+      <rect x="320" y="60" width="230" height="110" rx="14" class="fill-b"/>
+      <text x="435" y="102" class="tb" text-anchor="middle">韧性</text>
+      <text x="435" y="134" class="ts" text-anchor="middle">能屈能伸，风过复起</text>
+      <rect x="590" y="60" width="230" height="110" rx="14" class="fill-y"/>
+      <text x="705" y="102" class="tb" text-anchor="middle">余地</text>
+      <text x="705" y="134" class="ts" text-anchor="middle">留白与回旋的空间</text>
+      <text x="435" y="212" class="ts" text-anchor="middle">老子之「柔」，非软弱，乃生命力的三种形态</text>
+    </svg>
+  </div>
+
+  <h3 class="block">义理阐发 · 「不争」的深一层</h3>
+  <div class="prose">
+    <p class="lead">本章与第八章互为表里：第八章以水喻<b>不争之德</b>，本章以生死喻<b>柔弱之理</b>。合而观之，老子的处世哲学可归为一句：<b>把「余地」留给别人，把「生机」留给自己。</b></p>
+    <p>「兵强则灭」一语，史不绝书。项羽力能扛鼎而乌江自刎，李广难封而刚极易折，皆可为注脚。反观能成久远之事者，多具水之性：<b>遇阻则绕，遇隙则入，遇时则聚</b>。汉初黄老之治、文景之休养生息，正是「柔弱处上」在政治上的实现。</p>
+    <p>需要辨明的是：<b>柔弱是「术」，更是「体」</b>。若只以柔为手段、以退为进，那仍是争，只是争法更巧。老子的本意是<b>心性上的不执、不躁、不盈</b>——外在的柔软，是内在虚静的自然流露。</p>
+  </div>
+
+  <div class="warn">
+    <h4>别把「柔弱」读成乡愿</h4>
+    <ul>
+      <li>老子说「柔弱胜刚强」，没说「放弃原则」。<b>水之就下是方向，水之穿石是意志</b>。</li>
+      <li>「不争」不适用于一切场合：对大是大非，老子亦言「慈故能勇」（第六十七章）——<b>慈柔者，反有真勇</b>。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch5">05 · 谷神不死 →</a>
+  </div>
+</section>
+
+<!-- ================= 05 谷神不死 ================= -->
+<section id="ch5">
+  <div class="ch-head">
+    <div class="ch-no">05</div>
+    <div>
+      <p class="part">CHAPTER 05 · 第三篇 · 修身之功</p>
+      <h2>谷神不死，是谓玄牝</h2>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>谷神不死，是谓玄牝。玄牝之门，是谓天地之根。绵绵呵若存，用之不堇。
+      <cite>—— 通行本第六章（据帛书本校句）</cite></p>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>这一章是全书最幽深的一章，也是<b>功夫论的枢纽</b>。老子以「谷」为象：山谷空虚而能受、能应、能生，正合于道之体性。「神」非鬼神之神，乃<b>神妙不测之用</b>——虚而能应，应而不穷。「谷神不死」合言之：<b>虚而能应的这种作用，永不枯竭</b>。</p>
+    <p>「玄牝」是进一步的譬喻：<b>玄</b>，幽深难测；<b>牝</b>，母性之门。天地万物皆由此幽深的「母体之门」源源而生，故曰「天地之根」。末句「绵绵呵若存，用之不堇」是全章的眼目——它讲的<b>不是宇宙论，而是用功的火候</b>：绵绵不绝而不刻意，若存若亡而不助长，如此运用，永不穷尽。</p>
+  </div>
+
+  <h3 class="block">连环画 · 虚而能应的四重意象</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="空谷回响">
+        <path d="M12 40 L48 92 L112 92 L148 40" class="st"/>
+        <path d="M48 92 C56 70 66 62 80 62 C94 62 104 70 112 92" class="fill-s"/>
+        <path d="M62 30 C70 24 78 24 86 30" class="st-hair" stroke-dasharray="3 3"/>
+        <path d="M54 22 C68 12 92 12 106 22" class="st-hair" stroke-dasharray="3 3"/>
+        <text x="80" y="110" class="ts" text-anchor="middle">谷：虚而能受，受而能应</text>
+      </svg></div>
+      <p class="bubble">山谷因空而能回响，<b>因虚而能容受</b>——「谷」是体，「神」是用。</p>
+      <p class="cap">谷神 · 虚而能应</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="玄牝之门：幽深的母体">
+        <path d="M50 96 C50 60 62 38 80 24 C98 38 110 60 110 96 Z" class="fill-w"/>
+        <path d="M64 96 C64 70 72 52 80 42 C88 52 96 70 96 96 Z" class="fill-b"/>
+        <path d="M30 96 L130 96" class="st-hair"/>
+        <text x="80" y="112" class="ts" text-anchor="middle">玄牝之门 · 天地之根</text>
+      </svg></div>
+      <p class="bubble">「玄牝」即<b>幽深的生养之门</b>：万物自此流出，而它自身永不告竭。</p>
+      <p class="cap">玄牝 · 生生之母</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="绵绵若存的细流">
+        <path d="M20 34 C40 40 36 56 56 62 C76 68 72 84 92 90 C112 96 108 104 128 106" class="st-thin"/>
+        <circle cx="20" cy="34" r="3" class="fill-b"/>
+        <circle cx="132" cy="106" r="3" class="fill-b"/>
+        <path d="M96 30 C104 24 112 24 120 30" class="st-hair" stroke-dasharray="3 3"/>
+        <text x="104" y="22" class="ts">若存</text>
+        <text x="80" y="26" class="ts" text-anchor="middle">绵绵呵若存</text>
+      </svg></div>
+      <p class="bubble">绵绵，是<b>不间断而不过力</b>；若存，是<b>似有若无而不执实</b>。</p>
+      <p class="cap">绵绵呵若存 · 火候</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="泉眼长流，用之不竭">
+        <path d="M44 96 C44 66 62 52 80 52 C98 52 116 66 116 96 Z" class="fill-g"/>
+        <path d="M80 52 C76 38 66 30 56 28" class="st-hair"/>
+        <path d="M80 52 C84 38 94 30 104 28" class="st-hair"/>
+        <ellipse cx="80" cy="96" rx="46" ry="8" class="fill-b"/>
+        <text x="80" y="22" class="ts" text-anchor="middle">用之不堇</text>
+      </svg></div>
+      <p class="bubble">泉眼无声而长流：<b>取之有道，则用之不穷</b>——「堇」即「尽」。</p>
+      <p class="cap">用之不堇 · 不竭之道</p>
+    </figure>
+  </div>
+
+  <h3 class="block">字义疏解 · 五个关键字</h3>
+  <div class="chips">
+    <div class="chip"><b>谷<i>GU</i></b><span>山谷之虚。取其三德：虚、受、应。河上公注：「谷，养也。」</span></div>
+    <div class="chip"><b>神<i>SHEN</i></b><span>神妙不测之作用。非鬼神，乃虚中所生的无穷妙用。</span></div>
+    <div class="chip"><b>玄牝<i>XUAN-PIN</i></b><span>幽深的母体。玄言其不可测，牝言其能生养。</span></div>
+    <div class="chip"><b>绵绵<i>MIAN</i></b><span>连续不断而不强劲。如丝如缕，柔而韧。</span></div>
+    <div class="chip"><b>堇<i>JIN</i></b><span>通「尽」，竭也。「用之不堇」即用之不尽。帛书本作「堇」。</span></div>
+  </div>
+
+  <h3 class="block">义理阐发 · 这一章究竟在说什么</h3>
+  <div class="prose">
+    <p class="lead">历来注家于此章有两路读法：一为<b>宇宙论</b>——道为天地万物所从出的本源；二为<b>功夫论</b>——虚静之心能生无穷妙用。两路其实是一路：老子论道，从不离人而言天。<b>「谷神」既是天地生生不息的本源，也是人心虚静灵明的本来状态。</b></p>
+    <p>此章与第五章「天地之间，其犹橐龠乎？虚而不屈，动而愈出」互参，义蕴方显：风箱因中空而能鼓风不竭，山谷因虚阔而能回响无穷，人心因静定而能应物不滞。<b>「虚」不是空无所有，而是空出位置，让生机自行涌现。</b>这是老子全部修养功夫的总原则。</p>
+    <p>最难解的是末句的火候。<b>「绵绵若存，用之不堇」八个字，讲的是「如何用功而不伤功」</b>：守虚静之心亦不可执守。一有「我要守住」的念头，便是助长；一助长，虚即转实，神即转滞。故必绵绵——不使断；若存——不使执。所谓「为无为」在功夫上的具体化，正在于此。</p>
+    <p>由此推之，一切精神创造、应事接物，皆可于此取证：<b>紧握则沙漏，放松则满掌</b>。心神之所以能长久为用，正在于不以「用」耗「体」，不以「求」伤「本」。</p>
+  </div>
+
+  <h3 class="block">图解 · 橐龠之喻与谷神之理</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 250" role="img" aria-label="风箱因空而鼓风不竭与谷神因虚而妙用不穷的对比">
+      <rect x="40" y="40" width="370" height="160" rx="14" class="fill-w" stroke-dasharray="8 6"/>
+      <text x="225" y="72" class="tb" text-anchor="middle">橐龠（第五章）</text>
+      <rect x="120" y="96" width="140" height="60" rx="10" class="fill-s"/>
+      <path d="M120 126 L84 126" class="st"/>
+      <path d="M260 112 L322 96 M260 126 L334 126 M260 140 L322 156" class="st-thin" marker-end="url(#arm)"/>
+      <text x="190" y="132" class="ts" text-anchor="middle">中空</text>
+      <text x="225" y="182" class="ts" text-anchor="middle">虚而不屈，动而愈出</text>
+
+      <rect x="480" y="40" width="370" height="160" rx="14" class="fill-g"/>
+      <text x="665" y="72" class="tb" text-anchor="middle">谷神（第六章）</text>
+      <path d="M560 156 L620 96 L700 96 L760 156" class="st"/>
+      <path d="M600 156 C615 128 640 118 660 118 C680 118 705 128 720 156" class="fill-b"/>
+      <text x="665" y="182" class="ts" text-anchor="middle">绵绵呵若存，用之不堇</text>
+    </svg>
+  </div>
+
+  <h3 class="block">今用 · 虚静的三种实践</h3>
+  <div class="action">
+    <h4>把「谷神」用在今天</h4>
+    <ol>
+      <li><b>留白</b>：日程留出不安排的时段。许多难题的答案，恰在「不再苦想」之后自行浮现——这是「虚而能应」的日常形态。</li>
+      <li><b>不助长</b>：专注时不强迫专注，放松时不责备放松。「绵绵若存」是可持续的节奏，不是咬牙的冲刺。</li>
+      <li><b>守中</b>：情绪起时不迎不拒，如谷之受声——来者应之，去者不留，心体自然复归于明。</li>
+    </ol>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch6">06 · 致虚极，守静笃 →</a>
+  </div>
+</section>
+
+<!-- ================= 06 致虚极守静笃 ================= -->
+<section id="ch6">
+  <div class="ch-head">
+    <div class="ch-no">06</div>
+    <div>
+      <p class="part">CHAPTER 06 · 第三篇 · 修身之功</p>
+      <h2>致虚极，守静笃</h2>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>致虚极，守静笃。万物并作，吾以观复。夫物芸芸，各复归其根。归根曰静，静曰复命，复命曰常，知常曰明。不知常，妄作凶。
+      <cite>—— 通行本第十六章（节引）</cite></p>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>这一章讲<b>观道的方法</b>。「致虚极，守静笃」是功夫：<b>把心推到极虚，把静守到极笃</b>——不是半日闲情，而是全部的虚、彻底的静。在此状态中观照万物，见其纷纷并作，而各各<b>复归其根</b>：无论怎样繁盛，终要回到根本。</p>
+    <p>「归根曰静」以下四句是层层递进的推论：<b>归根即静，静即复归生命本然（复命），复命即恒常之理（常），识得恒常即为明</b>。反之，「不知常，妄作凶」——不懂这个循环规律而轻举妄动，必有凶咎。这是老子认识论与修养论的合一。</p>
+  </div>
+
+  <h3 class="block">连环画 · 观复四幕</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="空寂的山中静坐">
+        <path d="M12 96 L52 40 L88 96 Z" class="fill-s"/>
+        <path d="M76 96 L110 52 L148 96 Z" class="fill-s"/>
+        <circle cx="80" cy="30" r="10" class="fill-w"/>
+        <text x="80" y="112" class="ts" text-anchor="middle">致虚极 · 守静笃</text>
+      </svg></div>
+      <p class="bubble">虚到极处，静到笃处——<b>心如止水，方能照物</b>。</p>
+      <p class="cap">功夫 · 虚静</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="万物并作的原野">
+        <path d="M16 96 L144 96" class="st-hair"/>
+        <circle cx="36" cy="70" r="8" class="fill-g"/>
+        <circle cx="66" cy="62" r="11" class="fill-g"/>
+        <circle cx="100" cy="72" r="8" class="fill-y"/>
+        <circle cx="128" cy="64" r="10" class="fill-r"/>
+        <path d="M36 78 L36 94 M66 73 L66 94 M100 80 L100 94 M128 74 L128 94" class="st-thin"/>
+        <text x="80" y="24" class="ts" text-anchor="middle">万物并作</text>
+      </svg></div>
+      <p class="bubble">万物一齐生长繁荣，<b>热闹纷纭</b>——此刻最难，也最需要「观」。</p>
+      <p class="cap">现象 · 并作</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="落叶归根">
+        <path d="M80 100 L80 52" class="st"/>
+        <path d="M80 70 L58 56 M80 62 L102 50" class="st-thin"/>
+        <path d="M62 30 C70 26 74 30 72 38 C66 40 60 36 62 30 Z" class="fill-y"/>
+        <path d="M102 26 C110 24 114 28 112 36 C106 38 100 32 102 26 Z" class="fill-y"/>
+        <path d="M70 44 C74 52 76 60 76 66 M110 42 C108 52 100 60 92 64" class="st-hair"/>
+        <text x="80" y="112" class="ts" text-anchor="middle">各复归其根</text>
+      </svg></div>
+      <p class="bubble">叶落归根，水流归海：<b>再盛大的生长，也有一个「回去」的方向</b>。</p>
+      <p class="cap">规律 · 归根</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="循环图：静、复命、常、明">
+        <circle cx="80" cy="58" r="36" class="fill-w"/>
+        <text x="80" y="34" class="t" text-anchor="middle">静</text>
+        <text x="110" y="62" class="t">命</text>
+        <text x="80" y="92" class="t" text-anchor="middle">常</text>
+        <text x="42" y="62" class="ty">明</text>
+        <path d="M80 22 A36 36 0 0 1 114 52" class="st-hair" marker-end="url(#arm)"/>
+      </svg></div>
+      <p class="bubble">归根则静，静则复命，复命则常，<b>知常则明</b>——四步，一圈。</p>
+      <p class="cap">结论 · 知常曰明</p>
+    </figure>
+  </div>
+
+  <h3 class="block">义理阐发 · 「观复」二字是全章之眼</h3>
+  <div class="prose">
+    <p class="lead">「万物并作，吾以观复」——一个<b>「复」</b>字，点出老子所见的宇宙节律：不是直线的生长，而是<b>循环的往复</b>。与第二十五章「远曰反」、第四十章「反者道之动」同条共贯。人生亦然：盛衰、穷通、聚散，皆在往复之中。</p>
+    <p>「知常曰明」的「常」，不是静止不变，而是<b>循环之理本身</b>。知常者，得时不狂、失时不忧，因其见及循环的下一段。不知常者则「妄作」——在下行周期里强求扩张，在上行周期里不知收敛，凶咎由此而生。</p>
+    <p>值得注意的是方法：<b>先有「致虚守静」的功夫，后有「观复」的眼力</b>。老子没有让人凭聪明去猜规律，而是让人先把心腾空——成见、欲望、焦虑，都是遮蔽「观」的尘埃。第五章的「守中」、第六章的「绵绵」、本章的「虚静」，三者实为同一条功夫线。</p>
+  </div>
+
+  <div class="chips">
+    <div class="chip"><b>虚极<i>1</i></b><span>成见清空到极处——不以昨日之见观今日之物。</span></div>
+    <div class="chip"><b>静笃<i>2</i></b><span>心绪沉静到笃处——不为一时得失所摇。</span></div>
+    <div class="chip"><b>观复<i>3</i></b><span>见万物循环往复之节律，不执一端。</span></div>
+    <div class="chip"><b>归根<i>4</i></b><span>繁华落尽见真淳——一切终回根本。</span></div>
+    <div class="chip"><b>复命<i>5</i></b><span>回归本然的生命状态，即「复命曰常」。</span></div>
+    <div class="chip"><b>知常<i>6</i></b><span>识得循环之理即为明；不知而妄作，则凶。</span></div>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch7">07 · 为道日损 →</a>
+  </div>
+</section>
+
+<!-- ================= 07 为道日损 ================= -->
+<section id="ch7">
+  <div class="ch-head">
+    <div class="ch-no">07</div>
+    <div>
+      <p class="part">CHAPTER 07 · 第三篇 · 修身之功</p>
+      <h2>为道日损</h2>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>为学日益，为道日损。损之又损，以至于无为。无为而无不为。取天下常以无事，及其有事，不足以取天下。
+      <cite>—— 通行本第四十八章</cite></p>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>老子在此画出两条相反的路：<b>为学，做加法</b>——知识、技能、见闻，日日增益；<b>为道，做减法</b>——成见、欲望、机巧，日日减损。两者并不矛盾：<b>学是入世的装备，道是还家的路</b>。但若只知加、不知减，则知识愈多，执障愈厚。</p>
+    <p>「损之又损，以至于无为」是功夫的终点：<b>减到无可再减，便与道相应</b>。此时的「无为」不是什么都不做，而是所作所为不夹杂私意妄作，故能「无不为」——<b>无所成而无所不成</b>。末句推及治天下：以「无事」取天下，若政令繁苛、百端造作，反而失天下。</p>
+  </div>
+
+  <h3 class="block">连环画 · 加法与减法</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="书山层层堆叠">
+        <rect x="26" y="80" width="108" height="14" rx="3" class="fill-b"/>
+        <rect x="34" y="64" width="92" height="14" rx="3" class="fill-g"/>
+        <rect x="42" y="48" width="76" height="14" rx="3" class="fill-y"/>
+        <rect x="50" y="32" width="60" height="14" rx="3" class="fill-r"/>
+        <text x="80" y="22" class="ts" text-anchor="middle">为学日益</text>
+      </svg></div>
+      <p class="bubble">为学是加法：<b>日知其所亡，学问层层累积</b>。</p>
+      <p class="cap">为学日益 · 入世的装备</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="剥落的石像露出本来">
+        <rect x="50" y="30" width="60" height="66" rx="28" class="fill-s"/>
+        <path d="M56 50 C62 42 74 42 78 50" class="st-hair"/>
+        <path d="M86 40 L98 34 M92 62 L104 60" class="st-hair"/>
+        <circle cx="80" cy="58" r="20" class="fill-w"/>
+        <text x="80" y="112" class="ts" text-anchor="middle">为道日损</text>
+      </svg></div>
+      <p class="bubble">为道是减法：<b>剥落多余的，本来面目才显</b>。</p>
+      <p class="cap">为道日损 · 还家的路</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="减之又减，直至空">
+        <rect x="30" y="44" width="100" height="42" rx="6" class="fill-w"/>
+        <rect x="46" y="52" width="68" height="26" rx="4" class="fill-w"/>
+        <rect x="62" y="58" width="36" height="14" rx="3" class="fill-w"/>
+        <circle cx="80" cy="65" r="4" class="fill-y"/>
+        <text x="80" y="30" class="ts" text-anchor="middle">损之又损</text>
+        <text x="80" y="108" class="ts" text-anchor="middle">以至于无为</text>
+      </svg></div>
+      <p class="bubble">损之又损，<b>直到无处再减</b>——私意去尽，即是无为。</p>
+      <p class="cap">损之又损 · 无为</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="四两拨千斤的天平">
+        <path d="M30 88 L130 88" class="st"/>
+        <path d="M80 88 L80 40" class="st"/>
+        <path d="M36 52 L124 44" class="st"/>
+        <rect x="24" y="52" width="26" height="18" rx="3" class="fill-g"/>
+        <rect x="110" y="30" width="28" height="18" rx="3" class="fill-y"/>
+        <circle cx="80" cy="36" r="5" class="fill-w"/>
+        <text x="80" y="110" class="ts" text-anchor="middle">无为而无不为</text>
+      </svg></div>
+      <p class="bubble">无为的人看似轻省，<b>事情却样样有着落</b>——力用在关节上，不在处处。</p>
+      <p class="cap">无为而无不为</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 两条路的对照</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 260" role="img" aria-label="为学做加法与为道做减法的对照">
+      <rect x="50" y="50" width="380" height="160" rx="14" class="fill-b"/>
+      <text x="240" y="90" class="tb" text-anchor="middle">为学日益</text>
+      <text x="240" y="126" class="t" text-anchor="middle">加法：知识 · 技能 · 见闻</text>
+      <text x="240" y="158" class="ts" text-anchor="middle">愈多愈好，日日增益</text>
+      <text x="240" y="186" class="ts" text-anchor="middle">用：应世之资</text>
+      <rect x="470" y="50" width="380" height="160" rx="14" class="fill-y"/>
+      <text x="660" y="90" class="tb" text-anchor="middle">为道日损</text>
+      <text x="660" y="126" class="t" text-anchor="middle">减法：成见 · 欲望 · 机巧</text>
+      <text x="660" y="158" class="ts" text-anchor="middle">愈少愈好，日日减损</text>
+      <text x="660" y="186" class="ts" text-anchor="middle">体：复归之本</text>
+    </svg>
+  </div>
+
+  <h3 class="block">义理阐发 · 老子反对的不是学问</h3>
+  <div class="prose">
+    <p class="lead">「为学日益，为道日损」常被误读为反智。实则老子所戒的不是知识本身，而是<b>以知识为傲、以机巧为能、以多闻为足</b>的心态。知识若无「损」的功夫相济，便会凝成执障——<b>所知愈多，能放下的愈少</b>。</p>
+    <p>「无为而无不为」是全书最有张力的一句。「无为」是<b>去掉了妄作的为</b>：不强求、不造作、不逆物之性；「无不为」是<b>剩下的全是顺理成章的为</b>。如庖丁解牛，刀刃游于骨节之间，「以无厚入有间」，看似无为，实则无所不可。</p>
+    <p>本章末句由修身推到治国，见出老子一贯的逻辑：<b>身与天下一理</b>。能损一己之私欲者，方能「以无事取天下」。这也解释了为何《道德经》的修养论与政治论从不分家。</p>
+  </div>
+
+  <div class="action">
+    <h4>今日可行的「损」</h4>
+    <ol>
+      <li><b>损一件执念</b>：挑一个「我必须如此」的念头，试着松开一周，观其结果。</li>
+      <li><b>损一处冗余</b>：删去日程里一件「有它不多、无它不少」的应酬。</li>
+      <li><b>损一分机心</b>：与人相交，少算一步得失，多存一分诚意——「无为」自此起。</li>
+    </ol>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch8">08 · 太上，不知有之 →</a>
+  </div>
+</section>
+
+<!-- ================= 08 太上不知有之 ================= -->
+<section id="ch8">
+  <div class="ch-head">
+    <div class="ch-no">08</div>
+    <div>
+      <p class="part">CHAPTER 08 · 第四篇 · 治世之道</p>
+      <h2>太上，不知有之</h2>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>太上，不知有之；其次，亲而誉之；其次，畏之；其次，侮之。信不足焉，有不信焉。悠兮其贵言。功成事遂，百姓皆谓「我自然」。
+      <cite>—— 通行本第十七章</cite></p>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>这一章是老子的<b>治理境界论</b>。他把为政者分为四等：最高的治理，人民<b>不知道他的存在</b>（不知有之）；其次，人民亲近并赞颂他；再次，人民畏惧他；最下，人民蔑视他。<b>后两等的病根在「信不足」</b>——政令失信，民自然不信。</p>
+    <p>最高境界的样子是「悠兮其贵言」——<b>政令极简，出言极慎</b>。最终「功成事遂，百姓皆谓我自然」：事情办成了，百姓却说「<b>这是我们自己做成的</b>」。这正是「无为而治」的理想状态：治理消隐，生机自发。</p>
+  </div>
+
+  <h3 class="block">连环画 · 四等治理</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="田野里各自劳作的人们">
+        <path d="M16 96 L144 96" class="st-hair"/>
+        <circle cx="38" cy="62" r="8" class="fill-s"/><path d="M38 70 L38 88" class="st-thin"/>
+        <circle cx="80" cy="58" r="8" class="fill-g"/><path d="M80 66 L80 88" class="st-thin"/>
+        <circle cx="122" cy="62" r="8" class="fill-y"/><path d="M122 70 L122 88" class="st-thin"/>
+        <text x="80" y="28" class="ts" text-anchor="middle">看不见治理者的存在</text>
+      </svg></div>
+      <p class="bubble">最高一等：<b>人们各安其业，几乎不觉得有人在治理</b>。</p>
+      <p class="cap">太上，不知有之</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="人们向一位长者致敬">
+        <circle cx="80" cy="42" r="11" class="fill-y"/>
+        <path d="M80 53 L80 78" class="st-thin"/>
+        <circle cx="42" cy="60" r="8" class="fill-s"/><circle cx="118" cy="60" r="8" class="fill-s"/>
+        <path d="M50 52 L58 46 M110 52 L102 46" class="st-hair"/>
+        <text x="80" y="106" class="ts" text-anchor="middle">亲而誉之</text>
+      </svg></div>
+      <p class="bubble">次一等：<b>人民亲近他、赞美他</b>——德政可见，故有称颂。</p>
+      <p class="cap">其次，亲而誉之</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="高堂上威严的官员">
+        <rect x="52" y="20" width="56" height="18" rx="3" class="fill-r"/>
+        <path d="M60 38 L60 78 M100 38 L100 78" class="st-thin"/>
+        <circle cx="80" cy="54" r="10" class="fill-s"/>
+        <path d="M36 92 L124 92" class="st-hair"/>
+        <path d="M50 84 L46 90 M110 84 L114 90" class="st-hair"/>
+        <text x="80" y="110" class="ts" text-anchor="middle">畏之 · 侮之</text>
+      </svg></div>
+      <p class="bubble">再下一等靠威势：<b>民畏其令，终至蔑其人</b>——「信不足」之故。</p>
+      <p class="cap">其次，畏之；其次，侮之</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="丰收之后的人们">
+        <path d="M16 96 L144 96" class="st-hair"/>
+        <circle cx="46" cy="72" r="9" class="fill-g"/>
+        <circle cx="84" cy="76" r="9" class="fill-y"/>
+        <circle cx="118" cy="70" r="9" class="fill-r"/>
+        <path d="M46 81 L46 92 M84 85 L84 92 M118 79 L118 92" class="st-thin"/>
+        <text x="80" y="34" class="ts" text-anchor="middle">「我自然」</text>
+        <text x="80" y="52" class="ts">功成事遂</text>
+      </svg></div>
+      <p class="bubble">最好的结局：事情成了，百姓说——<b>「这是我们自己做成的。」</b></p>
+      <p class="cap">功成事遂 · 百姓皆谓我自然</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 治理境界的阶梯</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 250" role="img" aria-label="四等治理境界阶梯图">
+      <path d="M120 210 L280 210 L280 160 L440 160 L440 110 L600 110 L600 60 L760 60" class="st"/>
+      <circle cx="200" cy="210" r="12" class="fill-r"/>
+      <circle cx="360" cy="160" r="12" class="fill-s"/>
+      <circle cx="520" cy="110" r="12" class="fill-g"/>
+      <circle cx="680" cy="60" r="12" class="fill-y"/>
+      <text x="200" y="240" class="t" text-anchor="middle">侮之</text>
+      <text x="200" y="188" class="ts" text-anchor="middle">信不足</text>
+      <text x="360" y="192" class="t" text-anchor="middle">畏之</text>
+      <text x="360" y="140" class="ts" text-anchor="middle">以威</text>
+      <text x="520" y="142" class="t" text-anchor="middle">亲誉</text>
+      <text x="520" y="92" class="ts" text-anchor="middle">以德</text>
+      <text x="680" y="92" class="t" text-anchor="middle">不知有之</text>
+      <text x="680" y="42" class="ts" text-anchor="middle">以道</text>
+      <text x="450" y="232" class="ty" text-anchor="middle">境界愈高，治理者的「存在感」愈低</text>
+    </svg>
+  </div>
+
+  <h3 class="block">义理阐发 · 「贵言」与信任的经济学</h3>
+  <div class="prose">
+    <p class="lead">「悠兮其贵言」的<b>「贵」</b>字极重：以言为贵，故不轻出。政令一多，朝令夕改，信用便在反复中磨损。<b>「信不足焉，有不信焉」</b>一语，道破信任的双向性——不信任从不凭空而来，它是一个系统「信用支出」大于「信用储蓄」的结果。</p>
+    <p>「不知有之」并非无所作为，而是<b>作为消隐于机制之中</b>。譬如良医「治未病」，功在无形；又如好的制度，使人各行其道而不知制度之力。这与现代管理学所说的「仆人式领导」「自组织」，其理相通。</p>
+    <p>末句「百姓皆谓我自然」是全书「自然」一词最生动的注脚：<b>事情办成，人人觉得出于自己</b>。治理者的最高成就，恰是让成就显得与治理者无关——此即「生而不有，为而不恃，长而不宰」（第十章）的政教版。</p>
+  </div>
+
+  <div class="chips">
+    <div class="chip"><b>不知有之<i>上</i></b><span>以道化民，功成而无名。</span></div>
+    <div class="chip"><b>亲誉<i>次</i></b><span>以德感民，民亲而誉之——已落第二义。</span></div>
+    <div class="chip"><b>畏<i>下</i></b><span>以威慑民，民畏而避之。</span></div>
+    <div class="chip"><b>侮<i>末</i></b><span>以诈驭民，信失而民侮之。</span></div>
+    <div class="chip"><b>贵言<i>药</i></b><span>出言愈慎，信愈厚——「悠兮其贵言」。</span></div>
+    <div class="chip"><b>我自然<i>境</i></b><span>功成事遂，民谓「我自然」——治理的化境。</span></div>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch9">09 · 以正治国 →</a>
+  </div>
+</section>
+
+<!-- ================= 09 以正治国 ================= -->
+<section id="ch9">
+  <div class="ch-head">
+    <div class="ch-no">09</div>
+    <div>
+      <p class="part">CHAPTER 09 · 第四篇 · 治世之道</p>
+      <h2>以正治国，以奇用兵</h2>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>以正治国，以奇用兵，以无事取天下。天下多忌讳，而民弥贫；民多利器，国家滋昏；人多伎巧，奇物滋起；法令滋彰，盗贼多有。故圣人云：我无为而民自化，我好静而民自正，我无事而民自富，我无欲而民自朴。
+      <cite>—— 通行本第五十七章</cite></p>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>这一章给出治国的总方略，也给出一组<b>反直觉的因果链</b>。方略是三句：<b>以正治国</b>（正道而行）、<b>以奇用兵</b>（兵者诡道，权变而已）、<b>以无事取天下</b>（不生事扰民，天下自归）。</p>
+    <p>随后的四个「滋」字句，是老子对<b>过度治理</b>的诊断：忌讳愈多，民愈穷；利器愈多，国愈乱；机巧愈多，邪物愈盛；法令愈密，盗贼愈众。<b>每多一层管制，便多一层反噬</b>。末四句「我无为而民自化」，则是正面的回答——问题不在民，在「我」。</p>
+  </div>
+
+  <h3 class="block">连环画 · 四个「滋」字句</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="贴满禁令的告示墙">
+        <rect x="30" y="24" width="100" height="68" rx="4" class="fill-w"/>
+        <path d="M42 40 L118 40 M42 54 L110 54 M42 68 L100 68" class="st-hair"/>
+        <text x="80" y="34" class="ts" text-anchor="middle">禁 · 忌 · 讳</text>
+        <text x="80" y="108" class="ts" text-anchor="middle">天下多忌讳，而民弥贫</text>
+      </svg></div>
+      <p class="bubble">禁令层层加码，<b>百姓动辄得咎，生计反愈困</b>。</p>
+      <p class="cap">忌讳多 · 民弥贫</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="人手持利器互相戒备">
+        <circle cx="52" cy="56" r="9" class="fill-s"/>
+        <circle cx="108" cy="56" r="9" class="fill-s"/>
+        <path d="M62 52 L84 44 M98 52 L76 44" class="st-thin"/>
+        <path d="M84 44 L92 36 M76 44 L68 36" class="st"/>
+        <text x="80" y="102" class="ts" text-anchor="middle">民多利器，国家滋昏</text>
+      </svg></div>
+      <p class="bubble">人人恃利器以相防，<b>国事遂在戒备中昏乱</b>。</p>
+      <p class="cap">利器多 · 国滋昏</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="奇巧之物层出不穷">
+        <rect x="30" y="58" width="24" height="24" rx="3" class="fill-y"/>
+        <circle cx="80" cy="70" r="13" class="fill-g"/>
+        <path d="M112 82 L124 52 L136 82 Z" class="fill-r"/>
+        <path d="M20 96 L140 96" class="st-hair"/>
+        <text x="80" y="30" class="ts" text-anchor="middle">人多伎巧，奇物滋起</text>
+      </svg></div>
+      <p class="bubble">机巧之风既盛，<b>邪僻奇物随之丛生</b>。</p>
+      <p class="cap">伎巧多 · 奇物起</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="厚厚的法典与锁链">
+        <rect x="38" y="30" width="84" height="56" rx="4" class="fill-s"/>
+        <path d="M50 46 L110 46 M50 60 L100 60 M50 74 L90 74" class="st-hair"/>
+        <circle cx="80" cy="98" r="8" class="fill-w"/>
+        <path d="M80 90 L80 86" class="st-thin"/>
+        <text x="80" y="22" class="ts" text-anchor="middle">法令滋彰，盗贼多有</text>
+      </svg></div>
+      <p class="bubble">条文愈密，<b>钻隙者愈巧</b>——防不胜防，正不胜奇。</p>
+      <p class="cap">法令彰 · 盗贼多</p>
+    </figure>
+  </div>
+
+  <h3 class="block">义理阐发 · 老子的「因果链」与「反治」</h3>
+  <div class="prose">
+    <p class="lead">四个「滋」字句，本质是一条<b>系统反馈回路</b>：治理者因问题而加管制，管制本身制造新问题，新问题又引来更多管制——<b>螺旋上升，终至于「民弥贫」「国滋昏」</b>。老子于两千余年前即见及此种「管制的自我增殖」，其洞察力至今令人惊叹。</p>
+    <p>但须善看：老子并非主张无政府。「以正治国」四字，正是<b>治</b>字。他所反对的，是<b>以「事」治国</b>——政令繁苛、忌讳丛生、以机巧为能。他的药方是釜底抽薪：<b>从治理者自身入手</b>。「我无为」「我好静」「我无事」「我无欲」，四个「我」字，责任全在上不在下。</p>
+    <p>「自化」「自正」「自富」「自朴」四个「自」字，与全书「自然」之义一脉相承：<b>百姓本有自我生化的机能，不需也不应被层层塑造</b>。这与现代治理中「减少干预、释放社会活力」的理念，可谓异代同调。</p>
+  </div>
+
+  <h3 class="block">今用 · 「无事」的现代读法</h3>
+  <div class="action">
+    <h4>少即是多的三种应用</h4>
+    <ol>
+      <li><b>带团队</b>：目标说清楚之后，少一点流程干预，团队自会找到路径——「我无为而民自化」。</li>
+      <li><b>育子女</b>：规矩宜少而坚定，忌讳宜简而一贯——「忌讳多而民弥贫」，家亦同理。</li>
+      <li><b>治己身</b>：与其立十条严苛的自律戒律，不如养一种朴素的生活节奏——「我无欲而民自朴」。</li>
+    </ol>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>我无为而民自化，我好静而民自正，我无事而民自富，我无欲而民自朴。</p>
+    <cite>—— 通行本第五十七章 · 全书治道之纲</cite>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ending">终 · 信言不美 →</a>
+  </div>
+</section>
+
+<!-- ================= 终 信言不美 ================= -->
+<section id="ending">
+  <div class="ch-head">
+    <div class="ch-no">终</div>
+    <div>
+      <p class="part">ENDING · 结语</p>
+      <h2>信言不美，利而不害</h2>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>信言不美，美言不信。善者不辩，辩者不善。知者不博，博者不知。圣人不积，既以为人己愈有，既以与人己愈多。天之道，利而不害；圣人之道，为而不争。
+      <cite>—— 通行本第八十一章</cite></p>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>全书以三组「不」字句收束：<b>信言不美，美言不信</b>（真实的话不动听，动听的话不真实）；<b>善者不辩，辩者不善</b>（良善者不巧辩，巧辩者不良善）；<b>知者不博，博者不知</b>（真知者不卖弄渊博，卖弄者未得真知）。三句都在拆穿<b>表与里的错位</b>，与开篇「道可道，非常道」首尾呼应。</p>
+    <p>随后两句把全书推向高潮：<b>圣人不藏私，越是为他人，自己越富足</b>——这是「既以为人己愈有，既以与人己愈多」。最后十二个字是全书的总归：<b>「天之道，利而不害；圣人之道，为而不争。」</b>天的法则是利益万物而不伤害，圣人的法则是成全万事而不争夺。五千言的道理，尽在于此。</p>
+  </div>
+
+  <h3 class="block">连环画 · 三组「不」字句</h3>
+    <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="朴素的陶碗">
+        <path d="M50 52 C50 78 66 88 80 88 C94 88 110 78 110 52 Z" class="fill-s"/>
+        <path d="M50 52 L110 52" class="st"/>
+        <text x="80" y="34" class="ts" text-anchor="middle">信言不美</text>
+        <text x="80" y="108" class="ts" text-anchor="middle">质朴 · 真实</text>
+      </svg></div>
+      <p class="bubble">真话如粗陶碗：<b>不饰纹彩，却堪日用</b>。</p>
+      <p class="cap">信言不美，美言不信</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="大树不言">
+        <path d="M80 100 L80 56" class="st"/>
+        <circle cx="80" cy="42" r="18" class="fill-g"/>
+        <path d="M30 100 L130 100" class="st-hair"/>
+        <path d="M40 30 C46 24 52 24 58 30" class="st-hair" stroke-dasharray="3 3"/>
+        <text x="48" y="22" class="ts">辩</text>
+      </svg></div>
+      <p class="bubble">大树不言，而<b>果实自见</b>——善者何须巧辩。</p>
+      <p class="cap">善者不辩，辩者不善</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="一泓深潭">
+        <path d="M28 62 C28 52 52 46 80 46 C108 46 132 52 132 62 L132 78 C132 90 108 96 80 96 C52 96 28 90 28 78 Z" class="fill-b"/>
+        <path d="M40 66 C52 60 68 58 80 58" class="st-hair"/>
+        <text x="80" y="30" class="ts" text-anchor="middle">知者不博</text>
+        <text x="80" y="112" class="ts" text-anchor="middle">深者不炫</text>
+      </svg></div>
+      <p class="bubble">深潭无波：<b>知道得越深，越不急于展示</b>。</p>
+      <p class="cap">知者不博，博者不知</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="太阳普照">
+        <circle cx="80" cy="56" r="20" class="fill-y"/>
+        <path d="M80 24 L80 14 M80 98 L80 108 M42 56 L32 56 M128 56 L138 56 M52 28 L45 21 M108 28 L115 21 M52 84 L45 91 M108 84 L115 91" class="st-thin"/>
+        <text x="80" y="62" class="t" text-anchor="middle">利</text>
+      </svg></div>
+      <p class="bubble">天之道：<b>普照万物而不索取</b>——利而不害，为而不争。</p>
+      <p class="cap">天之道，利而不害</p>
+    </figure>
+  </div>
+
+  <h3 class="block">全书总结 · 五句话带走</h3>
+  <div class="chips">
+    <div class="chip"><b>01<i>道</i></b><span>道是万物本源与法则，不可执名以求，唯可虚静以观。</span></div>
+    <div class="chip"><b>02<i>反</i></b><span>「反者道之动」——物极必反，知循环则知进退。</span></div>
+    <div class="chip"><b>03<i>柔</i></b><span>柔弱生而坚强死——留余地者，得生机。</span></div>
+    <div class="chip"><b>04<i>损</i></b><span>为道日损，损去成见与妄作，无为而无不为。</span></div>
+    <div class="chip"><b>05<i>争</i></b><span>为而不争，利而不害——五千言之总归。</span></div>
+    <div class="chip"><b>∞<i>观</i></b><span>致虚守静，观复知常——把「观」字用一辈子。</span></div>
+  </div>
+
+  <h3 class="block">合卷之言</h3>
+  <div class="prose">
+    <p class="lead">《道德经》八十一章，从「道可道」始，到「为而不争」终。<b>首章破「名」，末章破「辩」</b>，破的都是同一物——人对表象的执著。中间七十九章，无非教人如何透过表象见其本然：在柔中见强，在虚中见生，在损中见得，在不争中见天下莫能与之争。</p>
+    <p>它不提供答案，提供的是<b>一种看法</b>。而按老子的逻辑，看法一变，答案自会不同。这或许正是这部五千言的小书，读之不尽的缘故。</p>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#core">★ 回到全书核心观念</a>
+  </div>
+</section>
+
+<footer>
+  <p>《道德经》深解手绘连环画 · 一章一世界 · 样式复刻自《富爸爸穷爸爸》手绘笔记模板 · 正文字体：微软雅黑。</p>
+  <p>⚠️ 本页原文据王弼通行本（个别章节参校帛书本），<b>字义疏解与义理阐发为原创</b>；历代注家各有胜义，欲深研请参校河上公、王弼、陈鼓应等注本。</p>
+</footer>
+
+</main>
+</div>
+</body>
+</html>
