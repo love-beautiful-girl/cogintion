@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>《赚1000元的1000种方法》手绘连环画 · 一章一世界</title>
+<style>
+  :root{
+    color-scheme: light;
+    --bg:#FFFBF0;
+    --paper:#FFFFFF;
+    --ink:#2E2A22;
+    --muted:#8B8271;
+    --line:#3B362C;
+    --sun:#F2C230;
+    --sun-soft:#FCF0C4;
+    --sun-deep:#D9991A;
+    --mint:#DCEBDA;
+    --sky:#DBE7EF;
+    --rose:#F4DAD3;
+    --sand:#F0E8D6;
+
+    /* 手绘字体体系：Apple 手写体优先，其次行楷/楷体，最后衬线 */
+    --hand:"Microsoft YaHei","微软雅黑","PingFang SC","Noto Sans SC",sans-serif;
+    --display:"HanziPen SC","Hannotate SC","Xingkai SC","STXingkai","Kaiti SC","STKaiti","KaiTi","楷体","DFKai-SB","Noto Serif SC",serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:18px; -webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font:16px/1.95 var(--hand);
+    letter-spacing:.015em;
+  }
+  a{color:inherit;}
+
+  /* 章节视图隔离：点开任一章节，页面只剩该章 */
+  main:has(> section:target) > section:not(:target){display:none;}
+
+  /* ---------- 布局 ---------- */
+  .wrap{display:flex; align-items:flex-start;}
+  nav.toc{
+    position:sticky; top:0;
+    flex:0 0 300px; align-self:flex-start;
+    height:100vh; overflow-y:auto; overscroll-behavior:contain;
+    background:var(--sun-soft);
+    border-right:2.5px solid var(--line);
+  }
+  nav.toc .toc-top{
+    position:sticky; top:0; z-index:6;
+    padding:20px 52px 12px 18px;
+    background:var(--sun-soft);
+    border-bottom:2px dashed var(--line);
+  }
+  nav.toc .brand{
+    font-family:var(--display);
+    font-size:23px; font-weight:700; line-height:1.3; margin:0;
+  }
+  nav.toc .brand small{
+    display:block; font:800 11px/1.4 ui-sans-serif,system-ui,sans-serif;
+    letter-spacing:.16em; color:#6E6555; margin-top:7px;
+  }
+  nav.toc .toc-scroll{padding:12px 18px 18px;}
+  nav.toc .part{
+    font-family:var(--display);
+    font-size:14.5px; font-weight:700; letter-spacing:.08em;
+    color:var(--sun-deep); margin:14px 0 5px;
+  }
+  nav.toc .part:first-child{margin-top:2px;}
+  nav.toc a{
+    display:flex; gap:9px; align-items:baseline;
+    text-decoration:none; padding:6px 9px; margin:1px -9px;
+    font-family:var(--display);
+    font-size:17px; line-height:1.55; color:var(--ink);
+    border-radius:20px 6px 18px 6px/6px 18px 6px 20px;
+  }
+  nav.toc a:hover{background:#fff; box-shadow:inset 0 -.38em 0 var(--sun);}
+  nav.toc a .n{
+    flex:0 0 28px;
+    font:800 13.5px/1.7 ui-sans-serif,system-ui,sans-serif; color:#6E6555;
+  }
+  nav.toc a.core{
+    background:#fff; border:2.4px solid var(--line);
+    margin:8px -5px 10px; font-weight:700;
+  }
+
+  /* ---------- 侧栏收尾卡 ---------- */
+  .nav-foot{
+    position:sticky; bottom:0; z-index:6;
+    display:flex; gap:12px; align-items:flex-start;
+    padding:14px 18px 18px; border-top:2.5px solid var(--line);
+    background:#F7EBC4;
+  }
+  .nav-foot svg{flex:0 0 56px; width:56px; height:auto;}
+  .nav-foot p{
+    margin:0; font-family:var(--display);
+    font-size:15.5px; line-height:1.75; color:#4A4234; font-weight:600;
+  }
+  .nav-foot p b{
+    display:block; font-size:13px; color:var(--sun-deep);
+    letter-spacing:.08em; margin-top:5px;
+  }
+
+  /* ---------- 折叠 / 展开（纯 CSS，零 JS） ---------- */
+  .nav-check{position:fixed; opacity:0; width:1px; height:1px; pointer-events:none;}
+  nav.toc .nav-collapse{
+    position:absolute; top:18px; right:14px; cursor:pointer;
+    padding:1px 12px; background:var(--paper); color:var(--ink);
+    border:2.4px solid var(--line);
+    border-radius:18px 5px 16px 5px/5px 16px 5px 18px;
+    font-family:var(--display); font-size:18px; line-height:1.6;
+  }
+  nav.toc .nav-collapse:hover{box-shadow:inset 0 -.38em 0 var(--sun);}
+  .nav-float{
+    position:fixed; top:14px; left:14px; z-index:80;
+    display:none; align-items:center; gap:9px; cursor:pointer;
+    padding:10px 20px; background:var(--sun); color:var(--ink);
+    border:2.5px solid var(--line);
+    border-radius:24px 7px 22px 7px/7px 22px 7px 24px;
+    font-family:var(--display); font-size:18px; font-weight:700;
+  }
+  .nav-float:hover{box-shadow:inset 0 -.42em 0 var(--sun-deep);}
+  .nav-float .ic{font-size:20px; line-height:1;}
+  #navToggle:checked ~ .nav-float{display:flex;}
+  #navToggle:checked ~ .wrap > nav.toc{display:none;}
+  #navToggle:checked ~ .wrap > main{max-width:1140px;}
+
+  main{flex:1 1 auto; min-width:0; padding:30px clamp(16px,3.4vw,56px) 70px;}
+  section{max-width:960px; margin:0 auto 24px; scroll-margin-top:18px;}
+  section:target{padding-top:6px;}
+
+  /* ---------- 手绘边框 ---------- */
+  .doodle{
+    background:var(--paper);
+    border:2.5px solid var(--line);
+    border-radius:255px 15px 225px 15px/15px 225px 15px 255px;
+  }
+  .doodle.a{border-radius:15px 225px 15px 255px/225px 15px 255px 15px;}
+  .doodle.b{border-radius:255px 15px 225px 15px/15px 225px 15px 255px;}
+
+  /* ---------- 封面 ---------- */
+  .hero{padding:34px 32px 30px; margin-bottom:30px;}
+  .kicker{
+    display:inline-block; font-size:12px; letter-spacing:.18em;
+    background:var(--sun); border:2px solid var(--line); padding:3px 13px;
+    border-radius:20px 5px 18px 5px/5px 18px 5px 20px;
+    font-family:var(--display);
+  }
+  h1{
+    font-family:var(--display);
+    font-size:clamp(28px,4.6vw,46px); line-height:1.25; margin:16px 0 8px;
+  }
+  h1 em{font-style:normal; box-shadow:inset 0 -.34em 0 var(--sun); padding:0 6px;}
+  .sub{color:var(--muted); margin:0 0 22px; font-size:15px;}
+  .meta{display:flex; flex-wrap:wrap; gap:8px 10px; font-size:13px; color:var(--muted); margin-bottom:24px;}
+  .meta span{
+    background:var(--sand); border:1.8px solid var(--line); padding:2px 11px;
+    border-radius:14px 4px 14px 4px/4px 14px 4px 14px;
+  }
+
+  /* ---------- 目录卡（封面内） ---------- */
+  .index-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:13px; margin-top:14px;}
+  .index-grid a{
+    display:block; text-decoration:none;
+    background:var(--paper); border:2.4px solid var(--line);
+    border-radius:14px 60px 14px 60px/60px 14px 60px 14px;
+    padding:13px 15px;
+  }
+  .index-grid a:nth-child(2n){border-radius:60px 14px 60px 14px/14px 60px 14px 60px; background:var(--sun-soft);}
+  .index-grid a:nth-child(3n){background:var(--mint);}
+  .index-grid a:nth-child(5n){background:var(--sky);}
+  .index-grid a:hover{box-shadow:inset 0 -.42em 0 var(--sun);}
+  .index-grid b{
+    display:block; font-family:var(--display); font-size:16px; margin-bottom:3px;
+  }
+  .index-grid b i{
+    font-style:normal; font:700 11px/1.5 ui-sans-serif,system-ui,sans-serif;
+    color:var(--sun-deep); letter-spacing:.1em; margin-right:6px;
+  }
+  .index-grid span{font-size:13px; color:var(--muted); line-height:1.55;}
+
+  /* ---------- 章节头 ---------- */
+  .ch-head{display:flex; gap:15px; align-items:center; margin-bottom:16px;}
+  .ch-no{
+    flex:0 0 66px; height:66px; display:grid; place-items:center;
+    background:var(--sun); border:2.5px solid var(--line);
+    border-radius:52% 48% 55% 45%/48% 55% 45% 52%;
+    font-family:var(--display); font-size:26px;
+  }
+  .ch-head .part{
+    margin:0; font:700 11px/1.5 ui-sans-serif,system-ui,sans-serif;
+    letter-spacing:.14em; color:var(--sun-deep);
+  }
+  .ch-head h2{
+    margin:2px 0 0; font-family:var(--display);
+    font-size:clamp(21px,2.8vw,30px); line-height:1.3;
+  }
+  section:target > .ch-head h2{box-shadow:inset 0 -.38em 0 var(--sun);}
+
+  h3.block{
+    font-size:13px; letter-spacing:.16em; color:var(--muted); font-weight:700;
+    margin:26px 0 12px; display:flex; align-items:center; gap:10px;
+  }
+  h3.block::after{content:""; flex:1; border-top:2px dashed var(--line); opacity:.32;}
+
+  /* ---------- 中心思想 ---------- */
+  .idea{
+    padding:18px 24px; margin:0 0 22px;
+    background:var(--sun-soft); border:2.5px solid var(--line);
+    border-radius:8px 220px 12px 230px/220px 10px 230px 14px;
+  }
+  .idea h3{
+    margin:0 0 8px; font-size:12px; letter-spacing:.16em;
+    color:var(--sun-deep); font-weight:700;
+  }
+  .idea h3::before{content:"◆ ";}
+  .idea p{margin:0 0 10px; font-size:16.5px; line-height:1.95;}
+  .idea p:last-child{margin-bottom:0;}
+
+  /* ---------- 书里的故事 ---------- */
+  .story{
+    display:grid; grid-template-columns:132px 1fr; gap:18px; align-items:start;
+    padding:18px 22px; margin:0 0 22px;
+    background:var(--paper); border:2.5px solid var(--line);
+    border-radius:200px 14px 210px 16px/16px 210px 14px 200px;
+  }
+  .story .pic{
+    background:var(--sand); border:2.2px solid var(--line);
+    border-radius:14px 40px 14px 40px/40px 14px 40px 14px; padding:4px;
+  }
+  .story .pic svg{width:100%; height:auto; display:block;}
+  .story h3{
+    margin:0 0 8px; font-family:var(--display); font-size:17px; letter-spacing:.02em;
+  }
+  .story h3::before{content:"📖 ";}
+  .story p{margin:0 0 9px; font-size:15.5px; line-height:1.95;}
+  .story p:last-child{margin-bottom:0;}
+  .story .src{
+    display:block; margin-top:8px; font-size:12px; color:var(--muted);
+    border-top:2px dashed var(--line); padding-top:7px;
+  }
+
+  /* ---------- 连环画 ---------- */
+  .comic{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:0 0 22px;}
+  .comic.two{grid-template-columns:repeat(2,1fr);}
+  .panel{
+    margin:0; padding:0 0 11px; background:var(--paper);
+    border:2.5px solid var(--line);
+    border-radius:14px 220px 16px 230px/220px 16px 230px 14px;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .panel:nth-child(3n+2){border-radius:220px 14px 230px 16px/16px 230px 14px 220px;}
+  .panel:nth-child(3n+3){border-radius:230px 16px 210px 14px/16px 230px 14px 220px;}
+  .panel .scene{border-bottom:2.5px solid var(--line); padding:6px 6px 2px; background:var(--sand);}
+  .panel:nth-child(4n+1) .scene{background:var(--sun-soft);}
+  .panel:nth-child(4n+2) .scene{background:var(--sky);}
+  .panel:nth-child(4n+3) .scene{background:var(--mint);}
+  .panel:nth-child(4n+4) .scene{background:var(--rose);}
+  .panel svg{width:100%; height:116px; display:block;}
+  .bubble{
+    position:relative; margin:13px 13px 5px; padding:9px 11px;
+    background:var(--paper); border:2.2px solid var(--line);
+    border-radius:16px 16px 16px 3px;
+    font-size:14px; line-height:1.7;
+  }
+  .bubble::after{
+    content:""; position:absolute; left:19px; bottom:-8px;
+    width:13px; height:13px; background:var(--paper);
+    border-right:2.2px solid var(--line); border-bottom:2.2px solid var(--line);
+  }
+  .bubble b{color:var(--sun-deep);}
+  .panel .cap{
+    margin:auto 13px 0; padding-top:7px; border-top:2px dashed var(--line);
+    font-size:11.5px; color:var(--muted); letter-spacing:.03em;
+  }
+  .panel .cap::before{content:"▸ "; color:var(--sun-deep);}
+
+  /* ---------- 图解卡 ---------- */
+  .figure{
+    padding:20px 20px 13px; margin:0 0 22px;
+    background:var(--paper); border:2.5px solid var(--line);
+    border-radius:18px 200px 18px 210px/200px 18px 210px 18px;
+  }
+  .figure h4{
+    margin:0 0 3px; text-align:center;
+    font-family:var(--display); font-size:16px;
+  }
+  .figure .fcap{text-align:center; font-size:12.5px; color:var(--muted); margin:2px 0 13px;}
+  .figure svg{width:100%; height:auto; display:block;}
+
+  /* ---------- 正文段落 ---------- */
+  .prose p{margin:0 0 13px; font-size:15.8px; line-height:2.02;}
+  .prose p:last-child{margin-bottom:0;}
+  .prose b{box-shadow:inset 0 -.34em 0 var(--sun); font-weight:700;}
+  .prose .lead{font-size:17px;}
+
+  /* ---------- 误区 / 行动卡 ---------- */
+  .warn{
+    padding:16px 22px; margin:0 0 22px;
+    background:var(--rose); border:2.5px solid var(--line);
+    border-radius:60px 14px 60px 14px/14px 60px 14px 60px;
+  }
+  .warn h4{margin:0 0 8px; font-family:var(--display); font-size:16.5px;}
+  .warn h4::before{content:"⚠️ ";}
+  .warn ul{margin:0; padding-left:20px;}
+  .warn li{font-size:15px; line-height:1.9; margin-bottom:5px;}
+  .warn li:last-child{margin-bottom:0;}
+
+  .action{
+    padding:16px 22px; margin:0 0 22px;
+    background:var(--mint); border:2.5px solid var(--line);
+    border-radius:14px 60px 14px 60px/60px 14px 60px 14px;
+  }
+  .action h4{margin:0 0 8px; font-family:var(--display); font-size:16.5px;}
+  .action h4::before{content:"✅ ";}
+  .action ol{margin:0; padding-left:22px;}
+  .action li{font-size:15px; line-height:1.9; margin-bottom:5px;}
+  .action li:last-child{margin-bottom:0;}
+
+  /* ---------- 要点网格 ---------- */
+  .chips{display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:12px; margin:0 0 22px;}
+  .chip{
+    background:var(--paper); border:2.2px solid var(--line);
+    border-radius:14px 60px 14px 60px/60px 14px 60px 14px; padding:11px 14px;
+  }
+  .chip:nth-child(2n){background:var(--sun-soft); border-radius:60px 14px 60px 14px/14px 60px 14px 60px;}
+  .chip:nth-child(3n){background:var(--mint);}
+  .chip b{display:block; font-family:var(--display); font-size:15.5px; margin-bottom:2px;}
+  .chip b i{
+    font-style:normal; font:700 11px/1.5 ui-sans-serif,system-ui,sans-serif;
+    color:var(--sun-deep); letter-spacing:.08em; margin-left:5px;
+  }
+  .chip span{font-size:13px; color:var(--muted); line-height:1.6;}
+
+  /* ---------- 金句 ---------- */
+  .quote{
+    display:flex; gap:15px; align-items:flex-start;
+    padding:17px 23px; background:var(--paper);
+    border:2.5px solid var(--line); border-left:10px solid var(--sun-deep);
+    border-radius:6px 200px 8px 210px/200px 8px 210px 6px;
+  }
+  .quote .mark{
+    font-family:var(--display); font-size:38px; line-height:.9;
+    color:var(--sun-deep);
+  }
+  .quote p{margin:0; font-family:var(--display); font-size:18px; line-height:1.8;}
+  .quote cite{
+    display:block; margin-top:6px;
+    font:500 12px/1.5 ui-sans-serif,system-ui,sans-serif;
+    font-style:normal; color:var(--muted);
+  }
+
+  /* ---------- 章内翻页 ---------- */
+  .pager{
+    display:flex; gap:12px; justify-content:space-between; align-items:center;
+    margin-top:26px; padding-top:16px; border-top:2.5px solid var(--line);
+  }
+  .pager a{
+    text-decoration:none; padding:7px 16px;
+    background:var(--paper); border:2.2px solid var(--line);
+    border-radius:20px 6px 18px 6px/6px 18px 6px 20px;
+    font-family:var(--display); font-size:15px;
+  }
+  .pager a:hover{box-shadow:inset 0 -.42em 0 var(--sun);}
+  .pager a.up{background:var(--sun-soft);}
+
+  footer{
+    max-width:960px; margin:0 auto; padding:22px 0 0;
+    border-top:2.5px solid var(--line);
+    font-size:12.5px; color:var(--muted); line-height:1.9;
+  }
+
+  /* ---------- SVG 手绘基调 ---------- */
+  svg .st{fill:none; stroke:var(--line); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;}
+  svg .st-thin{fill:none; stroke:var(--line); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+  svg .st-hair{fill:none; stroke:var(--line); stroke-width:1.3; stroke-linecap:round; stroke-linejoin:round;}
+  svg .fill-y{fill:var(--sun); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-g{fill:var(--mint); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-b{fill:var(--sky); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-r{fill:var(--rose); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-w{fill:var(--paper); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-s{fill:var(--sand); stroke:var(--line); stroke-width:2.2;}
+  svg text{
+    font-family:"Microsoft YaHei","微软雅黑","PingFang SC",sans-serif;
+    fill:var(--ink);
+  }
+  svg .t{font-size:13px; font-weight:600;}
+  svg .ts{font-size:11px; fill:var(--muted);}
+  svg .tb{font-size:15px; font-weight:700;}
+  svg .ty{fill:var(--sun-deep); font-weight:700;}
+  svg .th{font-size:11.5px; font-weight:700; fill:var(--line);}
+
+  @media (max-width:900px){
+    .wrap{flex-direction:column;}
+    nav.toc{
+      position:static; flex:0 0 auto; width:100%; height:auto;
+      overflow:visible;
+      border-right:none; border-bottom:2.5px solid var(--line);
+    }
+    nav.toc .toc-top{position:static;}
+    .nav-foot{position:static;}
+    .nav-float{top:auto; bottom:16px; left:16px;}
+    .comic,.comic.two{grid-template-columns:1fr;}
+    .story{grid-template-columns:1fr;}
+    .story .pic{max-width:220px;}
+  }
+</style>
+</head>
+<body>
+<input type="checkbox" id="navToggle" class="nav-check" />
+<label class="nav-float" for="navToggle" title="展开目录"><span class="ic">☰</span><span>展开目录</span></label>
+<div class="wrap">
+
+<!-- ================= 左侧章节导航（可折叠） ================= -->
+<nav class="toc">
+  <div class="toc-top">
+    <p class="brand">赚1000元的1000种方法<small>ONE THOUSAND WAYS TO MAKE $1000</small></p>
+    <label class="nav-collapse" for="navToggle" title="收起目录">«</label>
+  </div>
+
+  <div class="toc-scroll">
+    <a class="core" href="#core"><span class="n">★</span><span>全书核心观念</span></a>
+
+    <p class="part">第一部分 · 起步</p>
+    <a href="#ch1"><span class="n">01</span><span>如何创业</span></a>
+    <a href="#ch2"><span class="n">02</span><span>商业销售</span></a>
+
+    <p class="part">第二部分 · 做出东西来卖</p>
+    <a href="#ch3"><span class="n">03</span><span>销售自制品</span></a>
+    <a href="#ch4"><span class="n">04</span><span>养殖适合市场销售的产品</span></a>
+
+    <p class="part">第三部分 · 让机器与系统干活</p>
+    <a href="#ch5"><span class="n">05</span><span>机器与投币生意</span></a>
+    <a href="#ending"><span class="n">终</span><span>合上书之后 · 筛选器与复利</span></a>
+  </div>
+
+  <div class="nav-foot">
+    <svg viewBox="0 0 60 60" role="img" aria-label="手绘存钱罐与硬币">
+      <ellipse cx="30" cy="36" rx="22" ry="16" class="fill-y"/>
+      <circle cx="52" cy="32" r="6" class="fill-y"/>
+      <circle cx="24" cy="32" r="3" class="fill-w"/>
+      <path d="M22 52 L18 58 M38 52 L42 58" class="st-thin"/>
+      <rect x="24" y="14" width="12" height="5" rx="2" class="fill-w"/>
+      <path d="M30 14 L30 6" class="st-hair"/>
+      <text x="30" y="10" class="ts">$</text>
+    </svg>
+    <p>第一笔 1000 美元，永远最难也最值钱。<b>—— 全书题眼</b></p>
+  </div>
+</nav>
+
+<main>
+
+<!-- ================= 封面 + 全书目录 ================= -->
+<section class="hero doodle" id="top">
+  <span class="kicker">手绘连环画 · 一章一世界</span>
+  <h1>《赚1000元的1000种方法》<br><em>一本关于「小本钱做成小生意」的手绘笔记</em></h1>
+  <p class="sub">弗朗西斯·米纳克 著 · 1936 年英文初版 · 中文版时事出版社 2023 · 巴菲特十一岁读到的商业启蒙书</p>
+  <div class="meta">
+    <span>5 章 · 三部分</span><span>数百个真实小生意案例</span><span>手绘图 50+ 幅</span><span>每章独立成篇</span>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>赚钱的第一步不是找到资本，而是找到一个别人愿意付钱解决的问题。
+      <cite>—— 全书题眼（本页为要点转述，非原文）</cite></p>
+  </div>
+
+  <h3 class="block">怎么用这个页面</h3>
+  <div class="prose">
+    <p class="lead">这不是一篇从头读到尾的长文，是一份<b>可以反复回来翻的手绘笔记</b>。左侧是全书目录，点开任何一章，页面就<b>只显示那一章</b>——不被前后内容干扰，随时可以只读一块。</p>
+    <p>侧栏右上角的 <b>«</b> 可以把目录收起来，专注读正文；收起后左上角会出现 <b>☰ 展开目录</b> 的黄色按钮。手机上那个按钮会自动移到左下角，不遮挡阅读。</p>
+    <p>每一章的结构是固定的：先看<b>中心思想</b>（如果你只有 30 秒），再看<b>连环画与图解</b>（案例长什么样），然后是<b>要点、误区与行动卡</b>（如果你要带走点东西）。赶时间就只看黄色便利贴和章末小结。</p>
+    <p>⚠️ 本页文字均为<b>要点转述与原创手绘再创作</b>，不是原书摘录；书里案例发生在 1930 年代的美国，<b>具体生意会过时，底层逻辑不会</b>。想读原文案例，请支持正版纸质书。</p>
+  </div>
+
+  <h3 class="block">点开任何一章，就是一整个世界</h3>
+  <div class="index-grid">
+    <a href="#core"><b><i>★</i>全书核心观念</b><span>1000 个方法背后只有 3 个动作</span></a>
+    <a href="#ch1"><b><i>01</i>如何创业</b><span>从金钱的故事到彭尼的第一笔 1000 美元</span></a>
+    <a href="#ch2"><b><i>02</i>商业销售</b><span>会卖的人，先赚到第一笔钱</span></a>
+    <a href="#ch3"><b><i>03</i>销售自制品</b><span>把手艺变成商品：肥皂、馅饼与旧轮胎</span></a>
+    <a href="#ch4"><b><i>04</i>养殖适合市场销售的产品</b><span>堇菜、肉鸡、水貂与山羊奶</span></a>
+    <a href="#ch5"><b><i>05</i>机器与投币生意</b><span>让设备替你上班：秤、台球桌与分成</span></a>
+    <a href="#ending"><b><i>终</i>合上书之后</b><span>筛选器、复利，以及十一岁的巴菲特</span></a>
+  </div>
+</section>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3B362C"/></marker>
+  <marker id="ary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#D9991A"/></marker>
+  <marker id="arm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#8B8271"/></marker>
+</defs></svg>
+
+<!-- ================= ★ 全书核心观念 ================= -->
+<section id="core">
+  <div class="ch-head">
+    <div class="ch-no">★</div>
+    <div>
+      <p class="part">THE CORE IDEA · 全书核心观念</p>
+      <h2>1000 个方法，其实只有 3 个动作</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>这本书列了几百上千个赚钱的点子：卖袜子、开馅饼店、养肉鸡、放投币体重秤……看上去眼花缭乱，但剥掉时代外壳，每个故事都在重复同一个三步循环：<b>发现需求 → 低成本验证 → 把它卖出去</b>。</p>
+    <p>为什么十一岁的巴菲特读完会立志成为百万富翁？因为他看到的不是某个具体生意，而是<b>第一笔 1000 美元的滚动力</b>：赚到的钱再投进去，生意开始复制自己——这正是复利最原始的模样。<b>方法有一千种，循环只有一个。</b></p>
+  </div>
+
+  <h3 class="block">主视觉 · 一个小生意的三步循环</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 260" role="img" aria-label="发现需求、低成本验证、卖出去、再投入的循环图">
+      <rect x="50" y="80" width="180" height="90" rx="12" class="fill-b"/>
+      <text x="140" y="118" class="tb" text-anchor="middle">① 发现需求</text>
+      <text x="140" y="146" class="ts" text-anchor="middle">谁在为什么付钱？</text>
+      <rect x="300" y="80" width="180" height="90" rx="12" class="fill-g"/>
+      <text x="390" y="118" class="tb" text-anchor="middle">② 低成本验证</text>
+      <text x="390" y="146" class="ts" text-anchor="middle">先试卖，别先建厂</text>
+      <rect x="550" y="80" width="180" height="90" rx="12" class="fill-y"/>
+      <text x="640" y="118" class="tb" text-anchor="middle">③ 卖出去</text>
+      <text x="640" y="146" class="ts" text-anchor="middle">成交才算数</text>
+      <path d="M242 125 L288 125" class="st" marker-end="url(#ar)"/>
+      <path d="M492 125 L538 125" class="st" marker-end="url(#ar)"/>
+      <path d="M740 125 C800 125 820 200 640 208 C390 218 160 210 120 186" class="st-thin" stroke-dasharray="7 6" marker-end="url(#ar)"/>
+      <text x="440" y="238" class="ty" text-anchor="middle">④ 利润再投入 → 生意开始复制自己</text>
+    </svg>
+  </div>
+
+  <h3 class="block">图解 · 全书路线图：从第一块钱到第一笔 1000 美元</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 300" role="img" aria-label="全书章节构成的赚钱路线图">
+      <path d="M60 240 C160 240 180 190 280 190 C380 190 400 140 500 140 C600 140 620 90 720 90 L840 90" class="st"/>
+      <circle cx="60" cy="240" r="10" class="fill-b"/>
+      <circle cx="280" cy="190" r="10" class="fill-g"/>
+      <circle cx="500" cy="140" r="10" class="fill-y"/>
+      <circle cx="720" cy="90" r="10" class="fill-r"/>
+      <text x="60" y="270" class="t" text-anchor="middle">起步 · 如何创业</text>
+      <text x="60" y="288" class="ts" text-anchor="middle">01 章</text>
+      <text x="280" y="162" class="t" text-anchor="middle">卖出第一件</text>
+      <text x="280" y="144" class="ts" text-anchor="middle">02 章 · 商业销售</text>
+      <text x="500" y="112" class="t" text-anchor="middle">做出自己的产品</text>
+      <text x="500" y="94" class="ts" text-anchor="middle">03-04 章</text>
+      <text x="720" y="62" class="t" text-anchor="middle">让系统替你干活</text>
+      <text x="720" y="44" class="ts" text-anchor="middle">05 章</text>
+      <path d="M830 82 L852 90 L830 98" class="st"/>
+      <text x="852" y="76" class="ty" text-anchor="end">$1000</text>
+    </svg>
+  </div>
+
+  <h3 class="block">概念拆解 · 全书的六个元逻辑</h3>
+  <div class="chips">
+    <div class="chip"><b>需求<i>NEED</i></b><span>先找愿意付钱的问题，再找产品。顺序反了，库存会教你做人。</span></div>
+    <div class="chip"><b>验证<i>TEST</i></b><span>小批量试卖、先收订单再生产——用最低成本买教训。</span></div>
+    <div class="chip"><b>销售<i>SELL</i></b><span>东西不会自己走出去。会讲价值的人，先拿到第一笔钱。</span></div>
+    <div class="chip"><b>复利<i>COMPOUND</i></b><span>第一笔 1000 美元再投入，让钱开始雇下一个 1000 美元。</span></div>
+    <div class="chip"><b>节俭<i>LEAN</i></b><span>固定成本压到最低：无店、无库存、在家开工是常态。</span></div>
+    <div class="chip"><b>行动<i>NOW</i></b><span>书里每个主角的共同点不是天才，是这周就开始干了。</span></div>
+  </div>
+
+  <h3 class="block">这本书不适用的情况</h3>
+  <div class="warn">
+    <h4>先说清楚边界</h4>
+    <ul>
+      <li>书里的具体生意（养山羊、卖袜子、投币秤）属于 <b>1930 年代的美国小镇</b>，照抄大概率水土不服。</li>
+      <li>它不是投资指南：<b>讲的是经营小生意赚现金流</b>，不是买股票买基金。</li>
+      <li>「1000 种方法」是激发灵感的素材库，不是承诺——<b>谁做、怎么做，比做哪一种重要十倍</b>。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch1">01 · 如何创业 →</a>
+  </div>
+</section>
+
+<!-- ================= 01 如何创业 ================= -->
+<section id="ch1">
+  <div class="ch-head">
+    <div class="ch-no">01</div>
+    <div>
+      <p class="part">CHAPTER 01 · 第一部分</p>
+      <h2>如何创业</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>第一章解决的是「从零到一」的心理与资金问题。<b>创业最难的不是点子，是按下启动键</b>。书里的答案朴素得近乎扫兴：先从自己熟悉的、本钱小的事情做起，先攒下第一笔 1000 美元——这笔钱的意义不在金额，而在<b>它证明了你能让一件生意转起来</b>。</p>
+    <p>关于启动资金，书里的态度也很务实：<b>用积蓄、用业余时间、用先接订单后生产的方式，把需要的钱压到最低</b>。钱不够不是不开始的理由，而是把生意设计得更轻的契机。</p>
+  </div>
+
+  <h3 class="block">连环画 · 一个人的创业第一天</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="数着攒下的硬币">
+        <rect x="30" y="74" width="100" height="22" rx="4" class="fill-s"/>
+        <ellipse cx="50" cy="68" rx="10" ry="5" class="fill-y"/>
+        <ellipse cx="50" cy="60" rx="10" ry="5" class="fill-y"/>
+        <ellipse cx="78" cy="68" rx="10" ry="5" class="fill-y"/>
+        <ellipse cx="106" cy="68" rx="10" ry="5" class="fill-y"/>
+        <ellipse cx="106" cy="60" rx="10" ry="5" class="fill-y"/>
+        <circle cx="80" cy="34" r="11" class="fill-b"/>
+        <path d="M80 45 L80 54" class="st-thin"/>
+        <text x="80" y="20" class="ts">先攒本钱</text>
+      </svg></div>
+      <p class="bubble">第一课：<b>本钱是攒出来的，也是省出来的</b>——两件事同时做。</p>
+      <p class="cap">资金 · 从自己的口袋开始</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="在餐桌上画商业草图">
+        <rect x="22" y="66" width="116" height="10" rx="3" class="fill-s"/>
+        <path d="M36 76 L36 96 M124 76 L124 96" class="st-thin"/>
+        <rect x="52" y="38" width="56" height="28" rx="3" class="fill-w"/>
+        <path d="M60 48 L100 48 M60 56 L88 56" class="st-hair"/>
+        <path d="M110 26 L118 26 M114 22 L114 30" class="st-thin"/>
+        <text x="80" y="30" class="ts">计划不必宏大</text>
+      </svg></div>
+      <p class="bubble">第二课：<b>第一份计划写在餐桌上就够了</b>，重要的是它能被今天执行。</p>
+      <p class="cap">计划 · 小到今天就能开始</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="挂出开张的小木牌">
+        <rect x="48" y="28" width="64" height="40" rx="6" class="fill-y"/>
+        <text x="80" y="53" class="t" text-anchor="middle">开张</text>
+        <path d="M80 68 L80 82" class="st-thin"/>
+        <circle cx="80" cy="92" r="12" class="fill-w"/>
+        <text x="80" y="97" class="ts" text-anchor="middle">1</text>
+        <path d="M28 40 C22 48 22 62 28 70" class="st-hair"/>
+        <path d="M132 40 C138 48 138 62 132 70" class="st-hair"/>
+      </svg></div>
+      <p class="bubble">第三课：<b>开门营业的那天不需要完美</b>，只需要真的有人能付钱给你。</p>
+      <p class="cap">启动 · 开张大于完美</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="第一个顾客付钱">
+        <circle cx="52" cy="52" r="11" class="fill-s"/>
+        <path d="M52 63 L52 88" class="st-thin"/>
+        <circle cx="108" cy="52" r="11" class="fill-g"/>
+        <path d="M108 63 L108 88" class="st-thin"/>
+        <rect x="70" y="58" width="22" height="14" rx="3" class="fill-y"/>
+        <path d="M64 65 L70 65 M92 65 L98 65" class="st-thin"/>
+        <text x="81" y="69" class="ts" text-anchor="middle">$</text>
+        <text x="80" y="108" class="ts" text-anchor="middle">第一笔收入 = 第一个验证</text>
+      </svg></div>
+      <p class="bubble">第四课：当第一个陌生人付钱，<b>你的生意才算出生</b>。</p>
+      <p class="cap">验证 · 收入即证明</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 启动资金的四个来源</h3>
+  <div class="chips">
+    <div class="chip"><b>积蓄<i>SAFE</i></b><span>最干净的钱：不求人，但要留足生活费再动。</span></div>
+    <div class="chip"><b>业余<i>TIME</i></b><span>下班后的时间是零成本的启动资本。</span></div>
+    <div class="chip"><b>订单<i>PRE</i></b><span>先收订单再生产——用客户的钱买原料。</span></div>
+    <div class="chip"><b>合伙<i>PAIR</i></b><span>互补的伙伴比多一个股东有用，权责先说清。</span></div>
+    <div class="chip"><b>轻资产<i>LEAN</i></b><span>能借不买、能租不建，固定成本决定生死线。</span></div>
+    <div class="chip"><b>滚雪球<i>SNOW</i></b><span>第一笔利润先别花，投回生意里换第二个 1000。</span></div>
+  </div>
+
+  <h3 class="block">误区 · 起步时最容易犯的错</h3>
+  <div class="warn">
+    <h4>三个常见坑</h4>
+    <ul>
+      <li>把「没本钱」当挡箭牌：书里几乎每个故事都是<b>从最小规模起步</b>的。</li>
+      <li>先租店面、先招人、先囤货——<b>固定成本上了身，动作就开始变形</b>。</li>
+      <li>憋大招等一个完美开局：开业第一周的粗糙，是全书主角的共同起点。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch2">02 · 商业销售 →</a>
+  </div>
+</section>
+
+<!-- ================= 02 商业销售 ================= -->
+<section id="ch2">
+  <div class="ch-head">
+    <div class="ch-no">02</div>
+    <div>
+      <p class="part">CHAPTER 02 · 第一部分</p>
+      <h2>商业销售</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>第二章整章都在讲同一件事：<b>销售是创业的氧气</b>。点子再好，卖不出去就是零。书里给「优秀销售员」画的像很朴素——熟悉自己的产品、敢于敲门、能听懂客户的拒绝、并且<b>坚持到成交的那一刻</b>。</p>
+    <p>这一章还反复示范了一个技巧：<b>先决定卖什么、卖给谁，再决定怎么卖</b>。卖袜子给家庭主妇、卖苗木给农户、卖定制西装给讲究人——品与人的匹配，比话术更早决定成败。</p>
+  </div>
+
+  <h3 class="block">连环画 · 一单生意的诞生</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="在地图上圈出客户区域">
+        <rect x="26" y="24" width="108" height="66" rx="6" class="fill-w"/>
+        <path d="M42 24 L42 90 M70 24 L70 90 M98 24 L98 90" class="st-hair"/>
+        <path d="M26 46 L134 46 M26 68 L134 68" class="st-hair"/>
+        <circle cx="84" cy="57" r="12" class="fill-r"/>
+        <text x="84" y="62" class="ts" text-anchor="middle">客群</text>
+      </svg></div>
+      <p class="bubble">先想清楚<b>卖给谁</b>：地图上圈出你的第一批客户。</p>
+      <p class="cap">定位 · 客户比产品先想</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="敲开一扇门">
+        <rect x="76" y="22" width="52" height="76" rx="4" class="fill-s"/>
+        <circle cx="86" cy="62" r="3" class="fill-y"/>
+        <circle cx="44" cy="52" r="11" class="fill-b"/>
+        <path d="M44 63 L44 88 M44 68 L60 58" class="st-thin"/>
+        <path d="M60 54 L64 50" class="st-hair"/>
+        <text x="30" y="30" class="ts">敲门</text>
+      </svg></div>
+      <p class="bubble">然后是<b>敢敲门</b>：销售员的第一件装备是腿，不是话术。</p>
+      <p class="cap">行动 · 拒绝是门票</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="倾听顾客说话">
+        <circle cx="58" cy="52" r="11" class="fill-s"/>
+        <path d="M58 63 L58 88" class="st-thin"/>
+        <circle cx="106" cy="52" r="11" class="fill-g"/>
+        <path d="M106 63 L106 88" class="st-thin"/>
+        <path d="M78 40 C86 34 94 34 100 38" class="st-thin"/>
+        <path d="M76 32 C88 22 102 22 110 28" class="st-hair"/>
+        <text x="82" y="80" class="ts">先听，后说</text>
+      </svg></div>
+      <p class="bubble">听懂拒绝背后的真实顾虑：<b>嫌贵？不急？不信任？各有各的钥匙</b>。</p>
+      <p class="cap">倾听 · 异议是需求的另一种说法</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="握手成交">
+        <path d="M30 70 L60 58 L80 64 L100 58 L130 70" class="st"/>
+        <circle cx="64" cy="66" r="8" class="fill-b"/>
+        <circle cx="96" cy="66" r="8" class="fill-g"/>
+        <rect x="70" y="36" width="20" height="14" rx="3" class="fill-y"/>
+        <text x="80" y="47" class="ts" text-anchor="middle">$</text>
+        <text x="80" y="100" class="ts" text-anchor="middle">成交是销售的唯一记分牌</text>
+      </svg></div>
+      <p class="bubble">最后是<b>请对方付钱</b>——不好意思开口的销售，等于白跑。</p>
+      <p class="cap">成交 · 大方地提出交易</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 优秀销售员的四件装备</h3>
+  <div class="action">
+    <h4>照着练一个月</h4>
+    <ol>
+      <li><b>产品烂熟于胸</b>：客户问到第三个问题还能答上来，信任就来了。</li>
+      <li><b>每天固定拜访量</b>：销售是概率游戏，数量先于技巧。</li>
+      <li><b>异议笔记本</b>：把每次被拒绝的理由记下来，下次准备答案。</li>
+      <li><b>成交的勇气</b>：每次拜访以「请求订单」收尾，不许空手而归。</li>
+    </ol>
+  </div>
+
+  <h3 class="block">要点 · 这一章的四个词</h3>
+  <div class="chips">
+    <div class="chip"><b>匹配<i>FIT</i></b><span>卖对的东西给对的人，胜过把冰卖给爱斯基摩人。</span></div>
+    <div class="chip"><b>勤快<i>FEET</i></b><span>腿脚的勤奋是最早的销售杠杆。</span></div>
+    <div class="chip"><b>异议<i>OBJ</i></b><span>嫌贵、再看看——每句拒绝里都藏着一条线索。</span></div>
+    <div class="chip"><b>坚持<i>ASK</i></b><span>成交发生在大多数人放弃的下一通电话里。</span></div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>产品解决需求，销售让需求知道它被解决了。</p>
+    <cite>—— 要点转述 · 非原文</cite>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch3">03 · 销售自制品 →</a>
+  </div>
+</section>
+
+<!-- ================= 03 销售自制品 ================= -->
+<section id="ch3">
+  <div class="ch-head">
+    <div class="ch-no">03</div>
+    <div>
+      <p class="part">CHAPTER 03 · 第二部分</p>
+      <h2>销售自制品</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>第三章转向<b>做东西来卖</b>：肥皂、馅饼、手工制品、甚至从旧轮胎里翻出的生意。共同逻辑是：<b>你亲手做的东西成本最低、差异最大</b>——因为别人复制不了你的手艺与配方。</p>
+    <p>书里示范的路径很清晰：<b>免费学会一门手艺 → 做出满足需求的产品 → 在社区里卖出去 → 扩大到更大的市场</b>。特色食品与手工艺品尤其适合起步：单价低、复购高、口碑传播快。</p>
+  </div>
+
+  <h3 class="block">连环画 · 从厨房到市场的四步</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="跟着师傅免费学手艺">
+        <circle cx="52" cy="44" r="11" class="fill-s"/>
+        <path d="M52 55 L52 82" class="st-thin"/>
+        <circle cx="104" cy="44" r="11" class="fill-y"/>
+        <path d="M104 55 L104 82 M104 62 L82 66" class="st-thin"/>
+        <rect x="70" y="66" width="24" height="16" rx="3" class="fill-w"/>
+        <text x="82" y="78" class="ts" text-anchor="middle">艺</text>
+        <text x="80" y="104" class="ts" text-anchor="middle">先学艺：免费也要学</text>
+      </svg></div>
+      <p class="bubble">第一步：<b>把手艺学到手</b>——书里很多人靠免费学徒换来了吃饭的本事。</p>
+      <p class="cap">学艺 · 技能是第一台机器</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="灶台上烤出的馅饼">
+        <rect x="26" y="58" width="108" height="34" rx="4" class="fill-w"/>
+        <rect x="38" y="68" width="84" height="14" rx="3" class="fill-s"/>
+        <ellipse cx="80" cy="46" rx="30" ry="12" class="fill-y"/>
+        <path d="M62 42 C70 36 90 36 98 42" class="st-hair"/>
+        <path d="M46 30 C50 24 56 24 60 28 M100 30 C104 24 110 24 114 28" class="st-hair"/>
+        <text x="80" y="108" class="ts" text-anchor="middle">家常的味道 = 配方的护城河</text>
+      </svg></div>
+      <p class="bubble">第二步：<b>做出拿得出手的样品</b>，好吃、好用，自己先过自己这关。</p>
+      <p class="cap">产品 · 过自己这关再出门</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="社区集市的小摊位">
+        <path d="M22 44 L138 44 L130 60 L30 60 Z" class="fill-y"/>
+        <path d="M38 60 L38 96 M122 60 L122 96" class="st-thin"/>
+        <rect x="52" y="68" width="24" height="16" rx="3" class="fill-g"/>
+        <rect x="84" y="68" width="24" height="16" rx="3" class="fill-b"/>
+        <text x="80" y="36" class="t" text-anchor="middle">社区集市</text>
+        <text x="80" y="110" class="ts" text-anchor="middle">先卖给邻居，口碑会走路</text>
+      </svg></div>
+      <p class="bubble">第三步：<b>在社区里试卖</b>——第一批顾客就是你的产品测试员。</p>
+      <p class="cap">试卖 · 本地市场是新手村</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="订单越来越多">
+        <rect x="30" y="70" width="26" height="20" rx="3" class="fill-w"/>
+        <rect x="60" y="58" width="26" height="32" rx="3" class="fill-w"/>
+        <rect x="90" y="42" width="26" height="48" rx="3" class="fill-y"/>
+        <path d="M126 34 L136 24 M126 24 L136 34" class="st-hair"/>
+        <path d="M30 98 L130 98" class="st-hair"/>
+        <text x="72" y="112" class="ts">订单在长高</text>
+      </svg></div>
+      <p class="bubble">第四步：<b>订单说话</b>——回头客多了，再谈扩大与招人。</p>
+      <p class="cap">放大 · 由复购驱动的增长</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 自制品的选品三条河</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 240" role="img" aria-label="选品的三个标准：成本低、有特色、能复购">
+      <rect x="40" y="60" width="230" height="110" rx="14" class="fill-g"/>
+      <text x="155" y="100" class="tb" text-anchor="middle">成本低</text>
+      <text x="155" y="132" class="ts" text-anchor="middle">家里就能开工，卖不掉也不伤筋骨</text>
+      <rect x="320" y="60" width="230" height="110" rx="14" class="fill-y"/>
+      <text x="435" y="100" class="tb" text-anchor="middle">有特色</text>
+      <text x="435" y="132" class="ts" text-anchor="middle">别人做不出的味道或手艺</text>
+      <rect x="600" y="60" width="230" height="110" rx="14" class="fill-b"/>
+      <text x="715" y="100" class="tb" text-anchor="middle">能复购</text>
+      <text x="715" y="132" class="ts" text-anchor="middle">肥皂、食品、日用——用完还会买</text>
+      <text x="435" y="210" class="ty" text-anchor="middle">三条都沾边的品，就是好起点</text>
+    </svg>
+  </div>
+
+  <div class="action">
+    <h4>这周就能做的最小验证</h4>
+    <ol>
+      <li>挑一样你做得比别人好的东西（哪怕只是煮得好喝的酸梅汤）。</li>
+      <li>做 20 份样品，去社区、朋友圈或集市<b>只试卖，不算账</b>。</li>
+      <li>记下：谁买了？谁回购了？谁问了但没买？——这比利润更值钱。</li>
+    </ol>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch4">04 · 养殖适合市场销售的产品 →</a>
+  </div>
+</section>
+
+<!-- ================= 04 养殖 ================= -->
+<section id="ch4">
+  <div class="ch-head">
+    <div class="ch-no">04</div>
+    <div>
+      <p class="part">CHAPTER 04 · 第二部分</p>
+      <h2>养殖适合市场销售的产品</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>第四章把目光投向<b>养殖与种植</b>：堇菜、肉鸡、水貂、山羊奶……在 1930 年代，这是一条许多普通人翻身的路。这一章的底层逻辑值得抽出：<b>选择养什么，不由喜好决定，由市场决定</b>——先问有没有人买，再动手养。</p>
+    <p>书中案例还有一条共同经验：<b>用小规模试养控制风险，用技术提升产量，用稳定的销路锁定利润</b>。养殖是有周期的生意，现金流要熬过等待期。</p>
+  </div>
+
+  <h3 class="block">连环画 · 一窝肉鸡的生意经</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="先去市场问行情">
+        <rect x="30" y="34" width="100" height="56" rx="8" class="fill-w"/>
+        <text x="80" y="58" class="t" text-anchor="middle">行情</text>
+        <path d="M48 70 L68 70 M82 70 L112 70" class="st-hair"/>
+        <circle cx="80" cy="98" r="8" class="fill-b"/>
+        <text x="80" y="26" class="ts">先问价，再养鸡</text>
+      </svg></div>
+      <p class="bubble">第一件事不是买鸡苗，是<b>去市场问清楚：谁要、要多少、什么价</b>。</p>
+      <p class="cap">市场先行 · 需求在生产之前</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="小规模试养的鸡舍">
+        <path d="M34 92 L34 58 L80 34 L126 58 L126 92 Z" class="fill-w"/>
+        <rect x="66" y="70" width="28" height="22" rx="3" class="fill-s"/>
+        <circle cx="52" cy="84" r="7" class="fill-y"/>
+        <circle cx="108" cy="84" r="7" class="fill-y"/>
+        <text x="80" y="26" class="ts">先养一小批</text>
+      </svg></div>
+      <p class="bubble">然后<b>小规模试养</b>：死了、亏了，都交得起学费。</p>
+      <p class="cap">试错 · 小批量买教训</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="记录生长数据的本子">
+        <rect x="42" y="26" width="76" height="64" rx="5" class="fill-w"/>
+        <path d="M54 42 L106 42 M54 54 L96 54 M54 66 L86 66" class="st-hair"/>
+        <path d="M42 26 L42 90" class="st-thin"/>
+        <text x="80" y="108" class="ts" text-anchor="middle">成活率 · 增重 · 成本，天天记</text>
+      </svg></div>
+      <p class="bubble">用<b>记录和数据</b>把「凭感觉养」升级成「按技术养」。</p>
+      <p class="cap">技术 · 养殖业的复利来源</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="卡车拉走出栏的鸡">
+        <rect x="30" y="52" width="70" height="34" rx="5" class="fill-b"/>
+        <path d="M100 62 L120 62 L132 76 L132 86 L100 86 Z" class="fill-w"/>
+        <circle cx="52" cy="92" r="8" class="fill-s"/>
+        <circle cx="114" cy="92" r="8" class="fill-s"/>
+        <path d="M20 40 L40 40 M126 40 L144 40" class="st-hair"/>
+        <text x="80" y="32" class="ts">出栏 → 现金回笼</text>
+      </svg></div>
+      <p class="bubble">最后是<b>出栏与回款</b>——别只顾养得好，更要卖得掉。</p>
+      <p class="cap">回款 · 养殖生意的终点站</p>
+    </figure>
+  </div>
+
+  <h3 class="block">要点 · 养殖生意的三个关键词</h3>
+  <div class="chips">
+    <div class="chip"><b>周期<i>TIME</i></b><span>从投入现金到回收现金，中间有漫长的空窗期。</span></div>
+    <div class="chip"><b>销路<i>SELL</i></b><span>没有订单的养殖场只是烧钱的动物园。</span></div>
+    <div class="chip"><b>技术<i>KNOW</i></b><span>成活率每高一成，利润就翻一个跟头。</span></div>
+    <div class="chip"><b>规模<i>SIZE</i></b><span>先小后大：规模是结果，不是起点。</span></div>
+    <div class="chip"><b>疫情<i>RISK</i></b><span>一场病可能清零，防疫投入不能省。</span></div>
+    <div class="chip"><b>特色<i>DIFF</i></b><span>山羊奶、水貂皮——小众品类竞争小、毛利高。</span></div>
+  </div>
+
+  <div class="warn">
+    <h4>这一章的时代提示</h4>
+    <ul>
+      <li>书中养殖案例是 <b>80 多年前的美国乡村背景</b>，今天涉及检疫、环保、用地合规，先查法规再动手。</li>
+      <li>特种养殖（水貂等）市场波动大、合规要求高，<b>别只看毛利不看门槛</b>。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch5">05 · 机器与投币生意 →</a>
+  </div>
+</section>
+
+<!-- ================= 05 机器与投币生意 ================= -->
+<section id="ch5">
+  <div class="ch-head">
+    <div class="ch-no">05</div>
+    <div>
+      <p class="part">CHAPTER 05 · 第三部分</p>
+      <h2>机器与投币生意</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>第五章是全书最「现代」的一章：<b>让机器替你上班</b>。投币体重秤、投币台球桌、电动座椅——这些 1930 年代的生意，本质和今天的自动售货机、共享设备一模一样：<b>一次投入，反复收费，无需守摊</b>。</p>
+    <p>书里的操作拆出来是三步：<b>选机器 → 谈点位 → 收分成</b>。机器放在药店门口、台球厅里，主人按月收钱。这是「资产产生收入」最朴素的原型——也是少年巴菲特读这本书时最着迷的部分。</p>
+  </div>
+
+  <h3 class="block">连环画 · 一台投币秤的生意</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="药店里的一台投币体重秤">
+        <rect x="58" y="30" width="44" height="62" rx="6" class="fill-w"/>
+        <circle cx="80" cy="48" r="12" class="fill-b"/>
+        <path d="M80 48 L86 42" class="st-hair"/>
+        <rect x="70" y="68" width="20" height="8" rx="2" class="fill-s"/>
+        <rect x="46" y="92" width="68" height="8" rx="3" class="fill-s"/>
+        <text x="80" y="22" class="ts">投币 · 称重 · 一美分</text>
+      </svg></div>
+      <p class="bubble">故事的起点小得可笑：<b>一台放在药店门口的投币体重秤</b>。</p>
+      <p class="cap">资产 · 一台会收钱的机器</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="和店主谈点位分成">
+        <circle cx="52" cy="50" r="11" class="fill-b"/>
+        <path d="M52 61 L52 88" class="st-thin"/>
+        <circle cx="108" cy="50" r="11" class="fill-s"/>
+        <path d="M108 61 L108 88" class="st-thin"/>
+        <rect x="70" y="56" width="20" height="14" rx="3" class="fill-y"/>
+        <text x="80" y="67" class="ts" text-anchor="middle">%</text>
+        <text x="80" y="108" class="ts" text-anchor="middle">好点位 = 流量 = 收入</text>
+      </svg></div>
+      <p class="bubble">关键一步是<b>和店主谈点位</b>：摆在哪，比机器本身更值钱。</p>
+      <p class="cap">点位 · 流量就是分成的基数</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="硬币从机器流进钱袋">
+        <rect x="24" y="36" width="40" height="52" rx="5" class="fill-w"/>
+        <circle cx="86" cy="44" r="6" class="fill-y"/>
+        <circle cx="98" cy="58" r="6" class="fill-y"/>
+        <circle cx="90" cy="72" r="6" class="fill-y"/>
+        <path d="M112 78 C102 68 116 58 126 62 C138 50 148 74 128 88 C118 96 108 92 104 86" class="fill-y"/>
+        <text x="44" y="106" class="ts">硬币自己流过来</text>
+      </svg></div>
+      <p class="bubble">之后的事就轻松了：<b>机器 24 小时营业，你只管定期来收硬币</b>。</p>
+      <p class="cap">被动收入 · 睡觉时也在营业</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="复制出多台机器排成一排">
+        <rect x="20" y="52" width="24" height="38" rx="4" class="fill-w"/>
+        <rect x="52" y="52" width="24" height="38" rx="4" class="fill-g"/>
+        <rect x="84" y="52" width="24" height="38" rx="4" class="fill-y"/>
+        <rect x="116" y="52" width="24" height="38" rx="4" class="fill-b"/>
+        <path d="M16 98 L146 98" class="st-hair"/>
+        <path d="M20 40 L140 40" class="st" marker-end="url(#ar)"/>
+        <text x="80" y="30" class="ty" text-anchor="middle">复制 → 复制 → 复制</text>
+      </svg></div>
+      <p class="bubble">最后是<b>复制</b>：一台赚小钱，一百台就是一门生意。</p>
+      <p class="cap">复制 · 把模型变成规模</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 投币生意的三步公式</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 230" role="img" aria-label="机器乘以点位乘以时间等于被动收入的公式">
+      <rect x="50" y="70" width="170" height="90" rx="12" class="fill-b"/>
+      <text x="135" y="110" class="tb" text-anchor="middle">机器 ×</text>
+      <text x="135" y="138" class="ts" text-anchor="middle">一次投入</text>
+      <rect x="260" y="70" width="170" height="90" rx="12" class="fill-g"/>
+      <text x="345" y="110" class="tb" text-anchor="middle">点位 ×</text>
+      <text x="345" y="138" class="ts" text-anchor="middle">谈下来的流量</text>
+      <rect x="470" y="70" width="170" height="90" rx="12" class="fill-y"/>
+      <text x="555" y="110" class="tb" text-anchor="middle">时间 =</text>
+      <text x="555" y="138" class="ts" text-anchor="middle">24 小时营业</text>
+      <rect x="680" y="60" width="180" height="110" rx="14" class="fill-r"/>
+      <text x="770" y="108" class="tb" text-anchor="middle">被动收入</text>
+      <text x="770" y="138" class="ts" text-anchor="middle">今天的自动售货机</text>
+    </svg>
+  </div>
+
+  <h3 class="block">要点 · 1936 年的机器，2026 年的样子</h3>
+  <div class="chips">
+    <div class="chip"><b>自动售货<i>THEN</i></b><span>投币秤、糖果机 → 今天的智能货柜与自助设备。</span></div>
+    <div class="chip"><b>共享租赁<i>THEN</i></b><span>台球桌按月租给台球厅 → 今天的设备租赁与共享。</span></div>
+    <div class="chip"><b>点位生意<i>THEN</i></b><span>药店门口 → 今天的地铁口、商场、直播间流量位。</span></div>
+    <div class="chip"><b>分成模式<i>THEN</i></b><span>与场地方分账 → 今天的联营、加盟、CPA 合作。</span></div>
+    <div class="chip"><b>复制逻辑<i>THEN</i></b><span>一台到一百台 → 今天的连锁化与矩阵化经营。</span></div>
+    <div class="chip"><b>核心不变<i>ALL</i></b><span>资产产生收入，收入再买资产——90 年来没变过。</span></div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>最好的生意，是睡觉时也在营业的生意。</p>
+    <cite>—— 要点转述 · 非原文</cite>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ending">终 · 合上书之后 →</a>
+  </div>
+</section>
+
+<!-- ================= 终 ================= -->
+<section id="ending">
+  <div class="ch-head">
+    <div class="ch-no">终</div>
+    <div>
+      <p class="part">ENDING · 合上书之后</p>
+      <h2>筛选器、复利，与十一岁的巴菲特</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>1936 年的这本书，让十一岁的巴菲特在图书馆里立下志向。他记住的不是哪一种具体方法，而是两个可以带走一辈子的东西：<b>一个筛选器</b>——每看到一个机会，就用「需求、验证、销售」三步去过滤；和<b>一个信念</b>——第一笔 1000 美元是复利的种子，越早种下越好。</p>
+    <p>所以这本「过时」的书今天依然值得翻：<b>生意会过时，但「发现问题、验证、成交、再投入」的循环永不过时</b>。</p>
+  </div>
+
+  <h3 class="block">连环画 · 图书馆里的那个下午</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="图书馆书架前的少年">
+        <rect x="18" y="20" width="30" height="80" rx="3" class="fill-s"/>
+        <rect x="56" y="20" width="30" height="80" rx="3" class="fill-s"/>
+        <rect x="94" y="20" width="30" height="80" rx="3" class="fill-s"/>
+        <path d="M18 48 L48 48 M18 76 L48 76 M56 48 L86 48 M56 76 L86 76 M94 48 L124 48 M94 76 L124 76" class="st-hair"/>
+        <circle cx="142" cy="60" r="10" class="fill-y"/>
+        <path d="M142 70 L142 92" class="st-thin"/>
+      </svg></div>
+      <p class="bubble">1936 年后的某天，一个十一岁的男孩从书架上<b>抽出一本旧书</b>。</p>
+      <p class="cap">相遇 · 偶然的抽书</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="少年趴在桌上读得入迷">
+        <rect x="22" y="70" width="116" height="10" rx="3" class="fill-s"/>
+        <rect x="52" y="52" width="56" height="18" rx="2" class="fill-w"/>
+        <circle cx="80" cy="34" r="11" class="fill-y"/>
+        <path d="M80 45 L80 52" class="st-thin"/>
+        <path d="M36 30 L28 22 M124 30 L132 22" class="st-hair"/>
+      </svg></div>
+      <p class="bubble">读到的每个小故事都在说：<b>普通人真的可以从零赚到 1000 美元</b>。</p>
+      <p class="cap">震动 · 「原来可以这样」</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="少年在纸上写下目标">
+        <rect x="36" y="30" width="88" height="56" rx="5" class="fill-w"/>
+        <path d="M50 50 L110 50 M50 64 L92 64" class="st-hair"/>
+        <text x="80" y="46" class="ty" text-anchor="middle">目标：百万富翁</text>
+        <path d="M108 96 L118 86 L128 96" class="st-thin"/>
+        <circle cx="80" cy="102" r="8" class="fill-b"/>
+      </svg></div>
+      <p class="bubble">合上书的那天，他<b>写下了自己的目标</b>，然后开始倒推该做什么。</p>
+      <p class="cap">立志 · 阅读变成路线图</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="小雪球滚成大雪球">
+        <circle cx="36" cy="88" r="8" class="fill-b"/>
+        <circle cx="66" cy="82" r="13" class="fill-g"/>
+        <circle cx="106" cy="70" r="22" class="fill-y"/>
+        <circle cx="136" cy="52" r="8" class="fill-w"/>
+        <path d="M16 102 L146 102" class="st-hair"/>
+        <path d="M20 60 L140 30" class="st-thin" stroke-dasharray="5 5"/>
+      </svg></div>
+      <p class="bubble">后来的事我们都知道了：他把「滚雪球」这件事，做了一辈子。</p>
+      <p class="cap">复利 · 全书埋下的种子</p>
+    </figure>
+  </div>
+
+  <h3 class="block">章末小结 · 全书五句话带走</h3>
+  <div class="chips">
+    <div class="chip"><b>01<i>需</i></b><span>先找到愿意付钱的问题，再决定做什么。</span></div>
+    <div class="chip"><b>02<i>小</i></b><span>用最小成本试卖，让市场而不是想象来打分。</span></div>
+    <div class="chip"><b>03<i>卖</i></b><span>敢敲门、敢开口——销售是创业的氧气。</span></div>
+    <div class="chip"><b>04<i>滚</i></b><span>第一笔 1000 元再投入，让复利开始工作。</span></div>
+    <div class="chip"><b>05<i>今</i></b><span>方法有一千种，行动只有今天一种。</span></div>
+    <div class="chip"><b>∞<i>环</i></b><span>需求 → 验证 → 销售 → 再投入，循环往复。</span></div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>第一笔 1000 美元的价值，不在它能买到什么，而在它证明了你能赚到它。</p>
+    <cite>—— 合上书时的一句总结 · 要点转述</cite>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#core">★ 回到全书核心观念</a>
+  </div>
+</section>
+
+<footer>
+  <p>《赚1000元的1000种方法》手绘连环画 · 一章一世界 · 样式复刻自《富爸爸穷爸爸》手绘笔记模板 · 正文字体：微软雅黑。</p>
+  <p>⚠️ 本页为<b>读书笔记式再创作</b>：全部文字均为要点转述与原创手绘图解，并非原书摘录；书中小生意案例多来自 1930 年代的美国，实践请以当下市场与法规为准。如需引用原文，请以正版纸质书为准。</p>
+</footer>
+
+</main>
+</div>
+</body>
+</html>

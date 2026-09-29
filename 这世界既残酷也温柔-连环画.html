@@ -1,0 +1,1457 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>《这世界既残酷也温柔》手绘连环画 · 一章一世界</title>
+<style>
+  :root{
+    color-scheme: light;
+    --bg:#FFFBF0;
+    --paper:#FFFFFF;
+    --ink:#2E2A22;
+    --muted:#8B8271;
+    --line:#3B362C;
+    --sun:#F2C230;
+    --sun-soft:#FCF0C4;
+    --sun-deep:#D9991A;
+    --mint:#DCEBDA;
+    --sky:#DBE7EF;
+    --rose:#F4DAD3;
+    --sand:#F0E8D6;
+
+    /* 手绘字体体系：Apple 手写体优先，其次行楷/楷体，最后衬线 */
+    --hand:"Hannotate SC","HanziPen SC","Xingkai SC","STXingkai","Kaiti SC","STKaiti","KaiTi","楷体","DFKai-SB","TW-Kai","Noto Serif SC","Songti SC",serif;
+    --display:"HanziPen SC","Hannotate SC","Xingkai SC","STXingkai","Kaiti SC","STKaiti","KaiTi","楷体","DFKai-SB","Noto Serif SC",serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:18px; -webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font:16px/1.95 var(--hand);
+    letter-spacing:.015em;
+  }
+  a{color:inherit;}
+
+  /* 章节视图隔离：点开任一章节，页面只剩该章 */
+  main:has(> section:target) > section:not(:target){display:none;}
+
+  /* ---------- 布局 ---------- */
+  .wrap{display:flex; align-items:flex-start;}
+  nav.toc{
+    position:sticky; top:0;
+    flex:0 0 300px; align-self:flex-start;
+    height:100vh; overflow-y:auto; overscroll-behavior:contain;
+    background:var(--sun-soft);
+    border-right:2.5px solid var(--line);
+  }
+  nav.toc .toc-top{
+    position:sticky; top:0; z-index:6;
+    padding:20px 52px 12px 18px;
+    background:var(--sun-soft);
+    border-bottom:2px dashed var(--line);
+  }
+  nav.toc .brand{
+    font-family:var(--display);
+    font-size:23px; font-weight:700; line-height:1.3; margin:0;
+  }
+  nav.toc .brand small{
+    display:block; font:800 11px/1.4 ui-sans-serif,system-ui,sans-serif;
+    letter-spacing:.16em; color:#6E6555; margin-top:7px;
+  }
+  nav.toc .toc-scroll{padding:12px 18px 18px;}
+  nav.toc .part{
+    font-family:var(--display);
+    font-size:14.5px; font-weight:700; letter-spacing:.08em;
+    color:var(--sun-deep); margin:14px 0 5px;
+  }
+  nav.toc .part:first-child{margin-top:2px;}
+  nav.toc a{
+    display:flex; gap:9px; align-items:baseline;
+    text-decoration:none; padding:6px 9px; margin:1px -9px;
+    font-family:var(--display);
+    font-size:17px; line-height:1.55; color:var(--ink);
+    border-radius:20px 6px 18px 6px/6px 18px 6px 20px;
+  }
+  nav.toc a:hover{background:#fff; box-shadow:inset 0 -.38em 0 var(--sun);}
+  nav.toc a .n{
+    flex:0 0 28px;
+    font:800 13.5px/1.7 ui-sans-serif,system-ui,sans-serif; color:#6E6555;
+  }
+  nav.toc a.core{
+    background:#fff; border:2.4px solid var(--line);
+    margin:8px -5px 10px; font-weight:700;
+  }
+
+  /* ---------- 侧栏收尾卡 ---------- */
+  .nav-foot{
+    position:sticky; bottom:0; z-index:6;
+    display:flex; gap:12px; align-items:flex-start;
+    padding:14px 18px 18px; border-top:2.5px solid var(--line);
+    background:#F7EBC4;
+  }
+  .nav-foot svg{flex:0 0 56px; width:56px; height:auto;}
+  .nav-foot p{
+    margin:0; font-family:var(--display);
+    font-size:15.5px; line-height:1.75; color:#4A4234; font-weight:600;
+  }
+  .nav-foot p b{
+    display:block; font-size:13px; color:var(--sun-deep);
+    letter-spacing:.08em; margin-top:5px;
+  }
+
+  /* ---------- 折叠 / 展开（纯 CSS，零 JS） ---------- */
+  .nav-check{position:fixed; opacity:0; width:1px; height:1px; pointer-events:none;}
+  nav.toc .nav-collapse{
+    position:absolute; top:18px; right:14px; cursor:pointer;
+    padding:1px 12px; background:var(--paper); color:var(--ink);
+    border:2.4px solid var(--line);
+    border-radius:18px 5px 16px 5px/5px 16px 5px 18px;
+    font-family:var(--display); font-size:18px; line-height:1.6;
+  }
+  nav.toc .nav-collapse:hover{box-shadow:inset 0 -.38em 0 var(--sun);}
+  .nav-float{
+    position:fixed; top:14px; left:14px; z-index:80;
+    display:none; align-items:center; gap:9px; cursor:pointer;
+    padding:10px 20px; background:var(--sun); color:var(--ink);
+    border:2.5px solid var(--line);
+    border-radius:24px 7px 22px 7px/7px 22px 7px 24px;
+    font-family:var(--display); font-size:18px; font-weight:700;
+  }
+  .nav-float:hover{box-shadow:inset 0 -.42em 0 var(--sun-deep);}
+  .nav-float .ic{font-size:20px; line-height:1;}
+  #navToggle:checked ~ .nav-float{display:flex;}
+  #navToggle:checked ~ .wrap > nav.toc{display:none;}
+  #navToggle:checked ~ .wrap > main{max-width:1140px;}
+
+  main{flex:1 1 auto; min-width:0; padding:30px clamp(16px,3.4vw,56px) 70px;}
+  section{max-width:960px; margin:0 auto 24px; scroll-margin-top:18px;}
+  section:target{padding-top:6px;}
+
+  /* ---------- 手绘边框 ---------- */
+  .doodle{
+    background:var(--paper);
+    border:2.5px solid var(--line);
+    border-radius:255px 15px 225px 15px/15px 225px 15px 255px;
+  }
+  .doodle.a{border-radius:15px 225px 15px 255px/225px 15px 255px 15px;}
+  .doodle.b{border-radius:255px 15px 225px 15px/15px 225px 15px 255px;}
+
+  /* ---------- 封面 ---------- */
+  .hero{padding:34px 32px 30px; margin-bottom:30px;}
+  .kicker{
+    display:inline-block; font-size:12px; letter-spacing:.18em;
+    background:var(--sun); border:2px solid var(--line); padding:3px 13px;
+    border-radius:20px 5px 18px 5px/5px 18px 5px 20px;
+    font-family:var(--display);
+  }
+  h1{
+    font-family:var(--display);
+    font-size:clamp(28px,4.6vw,46px); line-height:1.25; margin:16px 0 8px;
+  }
+  h1 em{font-style:normal; box-shadow:inset 0 -.34em 0 var(--sun); padding:0 6px;}
+  .sub{color:var(--muted); margin:0 0 22px; font-size:15px;}
+  .meta{display:flex; flex-wrap:wrap; gap:8px 10px; font-size:13px; color:var(--muted); margin-bottom:24px;}
+  .meta span{
+    background:var(--sand); border:1.8px solid var(--line); padding:2px 11px;
+    border-radius:14px 4px 14px 4px/4px 14px 4px 14px;
+  }
+
+  /* ---------- 目录卡（封面内） ---------- */
+  .index-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:13px; margin-top:14px;}
+  .index-grid a{
+    display:block; text-decoration:none;
+    background:var(--paper); border:2.4px solid var(--line);
+    border-radius:14px 60px 14px 60px/60px 14px 60px 14px;
+    padding:13px 15px;
+  }
+  .index-grid a:nth-child(2n){border-radius:60px 14px 60px 14px/14px 60px 14px 60px; background:var(--sun-soft);}
+  .index-grid a:nth-child(3n){background:var(--mint);}
+  .index-grid a:nth-child(5n){background:var(--sky);}
+  .index-grid a:hover{box-shadow:inset 0 -.42em 0 var(--sun);}
+  .index-grid b{
+    display:block; font-family:var(--display); font-size:16px; margin-bottom:3px;
+  }
+  .index-grid b i{
+    font-style:normal; font:700 11px/1.5 ui-sans-serif,system-ui,sans-serif;
+    color:var(--sun-deep); letter-spacing:.1em; margin-right:6px;
+  }
+  .index-grid span{font-size:13px; color:var(--muted); line-height:1.55;}
+
+  /* ---------- 章节头 ---------- */
+  .ch-head{display:flex; gap:15px; align-items:center; margin-bottom:16px;}
+  .ch-no{
+    flex:0 0 66px; height:66px; display:grid; place-items:center;
+    background:var(--sun); border:2.5px solid var(--line);
+    border-radius:52% 48% 55% 45%/48% 55% 45% 52%;
+    font-family:var(--display); font-size:26px;
+  }
+  .ch-head .part{
+    margin:0; font:700 11px/1.5 ui-sans-serif,system-ui,sans-serif;
+    letter-spacing:.14em; color:var(--sun-deep);
+  }
+  .ch-head h2{
+    margin:2px 0 0; font-family:var(--display);
+    font-size:clamp(21px,2.8vw,30px); line-height:1.3;
+  }
+  section:target > .ch-head h2{box-shadow:inset 0 -.38em 0 var(--sun);}
+
+  h3.block{
+    font-size:13px; letter-spacing:.16em; color:var(--muted); font-weight:700;
+    margin:26px 0 12px; display:flex; align-items:center; gap:10px;
+  }
+  h3.block::after{content:""; flex:1; border-top:2px dashed var(--line); opacity:.32;}
+
+  /* ---------- 中心思想 ---------- */
+  .idea{
+    padding:18px 24px; margin:0 0 22px;
+    background:var(--sun-soft); border:2.5px solid var(--line);
+    border-radius:8px 220px 12px 230px/220px 10px 230px 14px;
+  }
+  .idea h3{
+    margin:0 0 8px; font-size:12px; letter-spacing:.16em;
+    color:var(--sun-deep); font-weight:700;
+  }
+  .idea h3::before{content:"◆ ";}
+  .idea p{margin:0 0 10px; font-size:16.5px; line-height:1.95;}
+  .idea p:last-child{margin-bottom:0;}
+
+  /* ---------- 书里的故事 ---------- */
+  .story{
+    display:grid; grid-template-columns:132px 1fr; gap:18px; align-items:start;
+    padding:18px 22px; margin:0 0 22px;
+    background:var(--paper); border:2.5px solid var(--line);
+    border-radius:200px 14px 210px 16px/16px 210px 14px 200px;
+  }
+  .story .pic{
+    background:var(--sand); border:2.2px solid var(--line);
+    border-radius:14px 40px 14px 40px/40px 14px 40px 14px; padding:4px;
+  }
+  .story .pic svg{width:100%; height:auto; display:block;}
+  .story h3{
+    margin:0 0 8px; font-family:var(--display); font-size:17px; letter-spacing:.02em;
+  }
+  .story h3::before{content:"📖 ";}
+  .story p{margin:0 0 9px; font-size:15.5px; line-height:1.95;}
+  .story p:last-child{margin-bottom:0;}
+  .story .src{
+    display:block; margin-top:8px; font-size:12px; color:var(--muted);
+    border-top:2px dashed var(--line); padding-top:7px;
+  }
+
+  /* ---------- 连环画 ---------- */
+  .comic{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:0 0 22px;}
+  .comic.two{grid-template-columns:repeat(2,1fr);}
+  .panel{
+    margin:0; padding:0 0 11px; background:var(--paper);
+    border:2.5px solid var(--line);
+    border-radius:14px 220px 16px 230px/220px 16px 230px 14px;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .panel:nth-child(3n+2){border-radius:220px 14px 230px 16px/16px 230px 14px 220px;}
+  .panel:nth-child(3n+3){border-radius:230px 16px 210px 14px/16px 230px 14px 220px;}
+  .panel .scene{border-bottom:2.5px solid var(--line); padding:6px 6px 2px; background:var(--sand);}
+  .panel:nth-child(4n+1) .scene{background:var(--sun-soft);}
+  .panel:nth-child(4n+2) .scene{background:var(--sky);}
+  .panel:nth-child(4n+3) .scene{background:var(--mint);}
+  .panel:nth-child(4n+4) .scene{background:var(--rose);}
+  .panel svg{width:100%; height:116px; display:block;}
+  .bubble{
+    position:relative; margin:13px 13px 5px; padding:9px 11px;
+    background:var(--paper); border:2.2px solid var(--line);
+    border-radius:16px 16px 16px 3px;
+    font-size:14px; line-height:1.7;
+  }
+  .bubble::after{
+    content:""; position:absolute; left:19px; bottom:-8px;
+    width:13px; height:13px; background:var(--paper);
+    border-right:2.2px solid var(--line); border-bottom:2.2px solid var(--line);
+  }
+  .bubble b{color:var(--sun-deep);}
+  .panel .cap{
+    margin:auto 13px 0; padding-top:7px; border-top:2px dashed var(--line);
+    font-size:11.5px; color:var(--muted); letter-spacing:.03em;
+  }
+  .panel .cap::before{content:"▸ "; color:var(--sun-deep);}
+
+  /* ---------- 图解卡 ---------- */
+  .figure{
+    padding:20px 20px 13px; margin:0 0 22px;
+    background:var(--paper); border:2.5px solid var(--line);
+    border-radius:18px 200px 18px 210px/200px 18px 210px 18px;
+  }
+  .figure h4{
+    margin:0 0 3px; text-align:center;
+    font-family:var(--display); font-size:16px;
+  }
+  .figure .fcap{text-align:center; font-size:12.5px; color:var(--muted); margin:2px 0 13px;}
+  .figure svg{width:100%; height:auto; display:block;}
+
+  /* ---------- 正文段落 ---------- */
+  .prose p{margin:0 0 13px; font-size:15.8px; line-height:2.02;}
+  .prose p:last-child{margin-bottom:0;}
+  .prose b{box-shadow:inset 0 -.34em 0 var(--sun); font-weight:700;}
+  .prose .lead{font-size:17px;}
+
+  /* ---------- 误区 / 行动卡 ---------- */
+  .warn{
+    padding:16px 22px; margin:0 0 22px;
+    background:var(--rose); border:2.5px solid var(--line);
+    border-radius:60px 14px 60px 14px/14px 60px 14px 60px;
+  }
+  .warn h4{margin:0 0 8px; font-family:var(--display); font-size:16.5px;}
+  .warn h4::before{content:"⚠️ ";}
+  .warn ul{margin:0; padding-left:20px;}
+  .warn li{font-size:15px; line-height:1.9; margin-bottom:5px;}
+  .warn li:last-child{margin-bottom:0;}
+
+  .action{
+    padding:16px 22px; margin:0 0 22px;
+    background:var(--mint); border:2.5px solid var(--line);
+    border-radius:14px 60px 14px 60px/60px 14px 60px 14px;
+  }
+  .action h4{margin:0 0 8px; font-family:var(--display); font-size:16.5px;}
+  .action h4::before{content:"✅ ";}
+  .action ol{margin:0; padding-left:22px;}
+  .action li{font-size:15px; line-height:1.9; margin-bottom:5px;}
+  .action li:last-child{margin-bottom:0;}
+
+  /* ---------- 要点网格 ---------- */
+  .chips{display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:12px; margin:0 0 22px;}
+  .chip{
+    background:var(--paper); border:2.2px solid var(--line);
+    border-radius:14px 60px 14px 60px/60px 14px 60px 14px; padding:11px 14px;
+  }
+  .chip:nth-child(2n){background:var(--sun-soft); border-radius:60px 14px 60px 14px/14px 60px 14px 60px;}
+  .chip:nth-child(3n){background:var(--mint);}
+  .chip b{display:block; font-family:var(--display); font-size:15.5px; margin-bottom:2px;}
+  .chip b i{
+    font-style:normal; font:700 11px/1.5 ui-sans-serif,system-ui,sans-serif;
+    color:var(--sun-deep); letter-spacing:.08em; margin-left:5px;
+  }
+  .chip span{font-size:13px; color:var(--muted); line-height:1.6;}
+
+  /* ---------- 金句 ---------- */
+  .quote{
+    display:flex; gap:15px; align-items:flex-start;
+    padding:17px 23px; background:var(--paper);
+    border:2.5px solid var(--line); border-left:10px solid var(--sun-deep);
+    border-radius:6px 200px 8px 210px/200px 8px 210px 6px;
+  }
+  .quote .mark{
+    font-family:var(--display); font-size:38px; line-height:.9;
+    color:var(--sun-deep);
+  }
+  .quote p{margin:0; font-family:var(--display); font-size:18px; line-height:1.8;}
+  .quote cite{
+    display:block; margin-top:6px;
+    font:500 12px/1.5 ui-sans-serif,system-ui,sans-serif;
+    font-style:normal; color:var(--muted);
+  }
+
+  /* ---------- 章内翻页 ---------- */
+  .pager{
+    display:flex; gap:12px; justify-content:space-between; align-items:center;
+    margin-top:26px; padding-top:16px; border-top:2.5px solid var(--line);
+  }
+  .pager a{
+    text-decoration:none; padding:7px 16px;
+    background:var(--paper); border:2.2px solid var(--line);
+    border-radius:20px 6px 18px 6px/6px 18px 6px 20px;
+    font-family:var(--display); font-size:15px;
+  }
+  .pager a:hover{box-shadow:inset 0 -.42em 0 var(--sun);}
+  .pager a.up{background:var(--sun-soft);}
+
+  footer{
+    max-width:960px; margin:0 auto; padding:22px 0 0;
+    border-top:2.5px solid var(--line);
+    font-size:12.5px; color:var(--muted); line-height:1.9;
+  }
+
+  /* ---------- SVG 手绘基调 ---------- */
+  svg .st{fill:none; stroke:var(--line); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;}
+  svg .st-thin{fill:none; stroke:var(--line); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+  svg .st-hair{fill:none; stroke:var(--line); stroke-width:1.3; stroke-linecap:round; stroke-linejoin:round;}
+  svg .fill-y{fill:var(--sun); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-g{fill:var(--mint); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-b{fill:var(--sky); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-r{fill:var(--rose); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-w{fill:var(--paper); stroke:var(--line); stroke-width:2.2;}
+  svg .fill-s{fill:var(--sand); stroke:var(--line); stroke-width:2.2;}
+  svg text{
+    font-family:"Hannotate SC","HanziPen SC","Kaiti SC","STKaiti","KaiTi","楷体",serif;
+    fill:var(--ink);
+  }
+  svg .t{font-size:13px; font-weight:600;}
+  svg .ts{font-size:11px; fill:var(--muted);}
+  svg .tb{font-size:15px; font-weight:700;}
+  svg .ty{fill:var(--sun-deep); font-weight:700;}
+  svg .th{font-size:11.5px; font-weight:700; fill:var(--line);}
+
+  @media (max-width:900px){
+    .wrap{flex-direction:column;}
+    nav.toc{
+      position:static; flex:0 0 auto; width:100%; height:auto;
+      overflow:visible;
+      border-right:none; border-bottom:2.5px solid var(--line);
+    }
+    nav.toc .toc-top{position:static;}
+    .nav-foot{position:static;}
+    .nav-float{top:auto; bottom:16px; left:16px;}
+    .comic,.comic.two{grid-template-columns:1fr;}
+    .story{grid-template-columns:1fr;}
+    .story .pic{max-width:220px;}
+  }
+</style>
+</head>
+<body>
+<input type="checkbox" id="navToggle" class="nav-check" />
+<label class="nav-float" for="navToggle" title="展开目录"><span class="ic">☰</span><span>展开目录</span></label>
+<div class="wrap">
+
+<!-- ================= 左侧章节导航（可折叠） ================= -->
+<nav class="toc">
+  <div class="toc-top">
+    <p class="brand">这世界既残酷也温柔<small>CRUEL AND GENTLE</small></p>
+    <label class="nav-collapse" for="navToggle" title="收起目录">«</label>
+  </div>
+
+  <div class="toc-scroll">
+    <a class="core" href="#core"><span class="n">★</span><span>全书核心观念</span></a>
+
+    <p class="part">第一部分 · 三篇推荐序</p>
+    <a href="#pre1"><span class="n">序1</span><span>这世界既残酷也温柔</span></a>
+    <a href="#pre2"><span class="n">序2</span><span>没想到你是这样的狮子座</span></a>
+    <a href="#pre3"><span class="n">序3</span><span>例外的人</span></a>
+
+    <p class="part">第二部分 · 自序与正文</p>
+    <a href="#ch4"><span class="n">04</span><span>自序 · 十年之约</span></a>
+    <a href="#ch5"><span class="n">05</span><span>主动选择，才能接近梦想</span></a>
+    <a href="#ch6"><span class="n">06</span><span>做从未来看正确的事</span></a>
+    <a href="#ch7"><span class="n">07</span><span>All in 一个波澜壮阔的事业</span></a>
+
+    <p class="part">第三部分 · 面向一代人</p>
+    <a href="#ch8"><span class="n">08</span><span>「90后」新文明宣言</span></a>
+    <a href="#ch9"><span class="n">09</span><span>我在财富自由的路上等着你</span></a>
+    <a href="#ch10"><span class="n">10</span><span>附录 · 粉丝问答</span></a>
+  </div>
+
+  <div class="nav-foot">
+    <svg viewBox="0 0 60 60" role="img" aria-label="手绘太阳与小路">
+      <circle cx="30" cy="20" r="12" class="fill-y"/>
+      <path d="M30 2 L30 7 M30 33 L30 38 M12 20 L17 20 M43 20 L48 20 M17 7 L20 10 M43 7 L40 10" class="st-hair"/>
+      <path d="M6 56 C18 42 26 48 30 40 C35 33 44 36 54 52" class="st"/>
+    </svg>
+    <p>世界残酷也温柔，取决于你往哪走。<b>—— 全书题眼</b></p>
+  </div>
+</nav>
+
+<main>
+
+<!-- ================= 封面 + 全书目录 ================= -->
+<section class="hero doodle" id="top">
+  <span class="kicker">手绘连环画 · 一章一世界</span>
+  <h1>《这世界既残酷也温柔》<br><em>一本关于「主动选择自己人生」的手绘笔记</em></h1>
+  <p class="sub">孙宇晨 著 · 九州出版社 2016.08 版 · 90 后创业者手写给同代人的成长随笔</p>
+  <div class="meta">
+    <span>10 章 · 三部分</span><span>三篇推荐序 + 自序</span><span>手绘图 60+ 幅</span><span>每章独立成篇</span>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>这世界既残酷，也温柔——残酷的是规则与竞争，温柔的是它始终给主动选择的人留了一扇门。
+      <cite>—— 全书题眼（本页为要点转述，非原文）</cite></p>
+  </div>
+
+  <h3 class="block">怎么用这个页面</h3>
+  <div class="prose">
+    <p class="lead">这不是一篇从头读到尾的长文，是一份<b>可以反复回来翻的手绘笔记</b>。左侧是全书目录，点开任何一章，页面就<b>只显示那一章</b>——不被前后内容干扰，随时可以只读一块。</p>
+    <p>侧栏右上角的 <b>«</b> 可以把目录收起来，专注读正文；收起后左上角会出现 <b>☰ 展开目录</b> 的黄色按钮。手机上那个按钮会自动移到左下角，不遮挡阅读。</p>
+    <p>每一章的结构是固定的：先看<b>中心思想</b>（如果你只有 30 秒），再看<b>书里的故事</b>（原书情节线索），然后是<b>连环画与图解</b>，最后是<b>要点、误区与行动卡</b>（如果你要带走点东西）。赶时间就只看黄色便利贴和章末小结。</p>
+    <p>⚠️ 本页文字均为<b>要点转述与原创手绘再创作</b>，不是原书摘录；想读原文，请支持正版纸质书。</p>
+  </div>
+
+  <h3 class="block">点开任何一章，就是一整个世界</h3>
+  <div class="index-grid">
+    <a href="#core"><b><i>★</i>全书核心观念</b><span>残酷与温柔的一体两面</span></a>
+    <a href="#pre1"><b><i>序1</i>这世界既残酷也温柔</b><span>朋友笔下的他，与这本书的底色</span></a>
+    <a href="#pre2"><b><i>序2</i>没想到你是这样的狮子座</b><span>标签之外，一个具体的年轻人</span></a>
+    <a href="#pre3"><b><i>序3</i>例外的人</b><span>例外不是天赋，是选择的复利</span></a>
+    <a href="#ch4"><b><i>04</i>自序 · 十年之约</b><span>从三本成绩到北大、赴美、创业的十年</span></a>
+    <a href="#ch5"><b><i>05</i>主动选择，才能接近梦想</b><span>被安排的人生，离梦想最远</span></a>
+    <a href="#ch6"><b><i>06</i>做从未来看正确的事</b><span>用五年后的自己倒推今天</span></a>
+    <a href="#ch7"><b><i>07</i>All in 一个波澜壮阔的事业</b><span>押注大趋势，然后全力投入</span></a>
+    <a href="#ch8"><b><i>08</i>「90后」新文明宣言</b><span>互联网原住民的个人崛起</span></a>
+    <a href="#ch9"><b><i>09</i>我在财富自由的路上等着你</b><span>财富自由是手段，不是终点</span></a>
+    <a href="#ch10"><b><i>10</i>附录 · 粉丝问答</b><span>学生思维、杠杆、终身学习</span></a>
+  </div>
+</section>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3B362C"/></marker>
+  <marker id="ary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#D9991A"/></marker>
+  <marker id="arm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#8B8271"/></marker>
+</defs></svg>
+
+<!-- ================= ★ 全书核心观念 ================= -->
+<section id="core">
+  <div class="ch-head">
+    <div class="ch-no">★</div>
+    <div>
+      <p class="part">THE CORE IDEA · 全书核心观念</p>
+      <h2>残酷与温柔，是同一个世界的两面</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>整本书其实只讲了一件事：<b>世界不会按你的心意运转，但它会回应你的选择</b>。竞争、淘汰、不确定性——这是「残酷」的一面，谁都躲不开；而只要你主动往前走一步，时代就会递过来一根绳子——这是「温柔」的一面。</p>
+    <p>作者用自己从三本成绩到北大、再到赴美留学与创业的十年路径反复论证：<b>起点不决定终点，选择才决定</b>。三篇推荐序负责描摹「例外的人」，自序负责交代「十年之约」，中间四章讲如何选择、如何判断、如何下注，最后两章把话筒递给一整代人。全书的动词只有一个：<b>选</b>。</p>
+  </div>
+
+  <h3 class="block">主视觉 · 同一个世界，两种走法</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 250" role="img" aria-label="被动等待的人与主动选择的人面对同一个世界的对比">
+      <rect x="14" y="20" width="410" height="196" rx="8" class="fill-w" stroke-dasharray="8 6"/>
+      <text x="220" y="48" class="tb" text-anchor="middle">被动等待：世界很残酷</text>
+      <circle cx="120" cy="120" r="17" class="fill-b"/>
+      <path d="M120 137 L120 172 M120 148 L100 162 M120 148 L140 162 M120 172 L106 194 M120 172 L134 194" class="st"/>
+      <path d="M170 105 C195 95 225 95 250 105" class="st-thin" stroke-dasharray="5 5"/>
+      <rect x="255" y="88" width="120" height="66" rx="8" class="fill-s"/>
+      <text x="315" y="118" class="t" text-anchor="middle">高墙</text>
+      <text x="315" y="138" class="ts" text-anchor="middle">规则 · 门槛 · 竞争</text>
+      <path d="M255 121 L215 121" class="st-thin" marker-end="url(#arm)"/>
+      <text x="220" y="205" class="ts" text-anchor="middle">「与我无关，我只等一个机会」</text>
+
+      <rect x="476" y="20" width="410" height="196" rx="8" class="fill-w" stroke-dasharray="8 6"/>
+      <text x="680" y="48" class="tb" text-anchor="middle">主动选择：世界很温柔</text>
+      <circle cx="560" cy="120" r="17" class="fill-y"/>
+      <path d="M560 137 L560 172 M560 148 L540 138 M560 148 L582 142 M560 172 L546 194 M560 172 L574 194" class="st"/>
+      <rect x="700" y="88" width="120" height="66" rx="8" class="fill-g"/>
+      <text x="760" y="118" class="t" text-anchor="middle">同一堵墙</text>
+      <text x="760" y="138" class="ts" text-anchor="middle">但上面开了一扇门</text>
+      <path d="M600 118 C645 105 675 108 700 112" class="st" marker-end="url(#ar)"/>
+      <path d="M726 154 L726 118 L754 118 L754 154" class="st-thin"/>
+      <text x="680" y="205" class="ts" text-anchor="middle">「先走一步，绳子才会递过来」</text>
+    </svg>
+  </div>
+
+  <h3 class="block">图解 · 全书路线图：从「被安排」到「自己选」</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 300" role="img" aria-label="全书十章构成的成长路线图">
+      <path d="M60 240 C160 240 180 180 280 180 C380 180 400 130 500 130 C600 130 620 80 720 80 L840 80" class="st"/>
+      <circle cx="60" cy="240" r="10" class="fill-b"/>
+      <circle cx="280" cy="180" r="10" class="fill-g"/>
+      <circle cx="500" cy="130" r="10" class="fill-y"/>
+      <circle cx="720" cy="80" r="10" class="fill-r"/>
+      <text x="60" y="270" class="t" text-anchor="middle">起点 · 被安排</text>
+      <text x="60" y="288" class="ts" text-anchor="middle">序 · 看见例外</text>
+      <text x="280" y="152" class="t" text-anchor="middle">选择 · 自序十年</text>
+      <text x="280" y="134" class="ts" text-anchor="middle">04-05 章</text>
+      <text x="500" y="102" class="t" text-anchor="middle">下注 · 未来视角</text>
+      <text x="500" y="84" class="ts" text-anchor="middle">06-07 章</text>
+      <text x="720" y="52" class="t" text-anchor="middle">代际 · 个人崛起</text>
+      <text x="720" y="34" class="ts" text-anchor="middle">08-10 章</text>
+      <path d="M830 72 L852 80 L830 88" class="st"/>
+      <text x="852" y="66" class="ty" text-anchor="end">财富自由</text>
+    </svg>
+  </div>
+
+  <h3 class="block">概念拆解 · 书名里的两个词</h3>
+  <div class="chips">
+    <div class="chip"><b>残酷<i>FACT</i></b><span>竞争真实存在，阶层与资源的差距真实存在，假装看不见只会更疼。</span></div>
+    <div class="chip"><b>温柔<i>CHOICE</i></b><span>时代给了工具、通道与杠杆，愿意动的人就能借上力。</span></div>
+    <div class="chip"><b>主动<i>VERB</i></b><span>全书的方法论只有一个动词：选。主动选，而不是被挑。</span></div>
+    <div class="chip"><b>未来<i>LENS</i></b><span>判断一件事做不做，不看今天舒不舒服，看五年后后不后悔。</span></div>
+    <div class="chip"><b>例外<i>COMPOUND</i></b><span>例外的人不是天生稀有，是把正确的小选择重复了足够多次。</span></div>
+    <div class="chip"><b>负责<i>OWNERSHIP</i></b><span>把自己的人生当成自己的公司来经营，亏了赚了都自己认。</span></div>
+  </div>
+
+  <h3 class="block">这本书不适用的情况</h3>
+  <div class="warn">
+    <h4>先说清楚边界</h4>
+    <ul>
+      <li>这不是投资指南，也不是成功学说明书——它给的是<b>选择的勇气</b>，不是稳赚的公式。</li>
+      <li>书中路径有强烈的时代背景（互联网早期、留学窗口期），照抄动作没用，要学的是<b>判断逻辑</b>。</li>
+      <li>「All in」不等于不计风险；先想清楚下行成本，再谈全力以赴。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#pre1">序1 · 这世界既残酷也温柔 →</a>
+  </div>
+</section>
+
+<!-- ================= 推荐序 1 ================= -->
+<section id="pre1">
+  <div class="ch-head">
+    <div class="ch-no">序1</div>
+    <div>
+      <p class="part">FOREWORD · 推荐序一</p>
+      <h2>这世界既残酷也温柔</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>第一篇推荐序是旁人落笔：从朋友的视角看作者，也点出了全书的底色——<b>世界残酷是事实，温柔是选择</b>。有人因残酷而退缩，有人因温柔而松懈，而这本书想说的是：看清残酷之后依然往前走的人，才配得上温柔。</p>
+    <p>序言的真正功能是给全书「定调」：它不是抱怨时代的檄文，也不是打鸡血的口号，而是一份<b>在真实竞争里保持体面与热情的行动记录</b>。</p>
+  </div>
+
+  <h3 class="block">连环画 · 残酷与温柔的一天</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="清晨拥挤的地铁">
+        <rect x="14" y="18" width="132" height="72" rx="12" class="fill-w"/>
+        <path d="M28 26 L132 26" class="st-hair"/>
+        <rect x="28" y="36" width="30" height="24" rx="3" class="fill-b"/>
+        <rect x="66" y="36" width="30" height="24" rx="3" class="fill-b"/>
+        <rect x="104" y="36" width="28" height="24" rx="3" class="fill-b"/>
+        <circle cx="44" cy="76" r="7" class="fill-s"/>
+        <circle cx="72" cy="76" r="7" class="fill-s"/>
+        <circle cx="100" cy="76" r="7" class="fill-s"/>
+        <path d="M20 96 L140 96" class="st-hair"/>
+      </svg></div>
+      <p class="bubble">早高峰的地铁里，<b>没人关心你昨晚几点睡</b>——规则照常运转。</p>
+      <p class="cap">残酷的一面：世界不欠谁一个例外</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="雨中有人把伞挪过来">
+        <path d="M20 96 C20 60 44 38 76 38 C108 38 132 60 132 96" class="fill-b"/>
+        <path d="M76 38 L76 24" class="st"/>
+        <circle cx="112" cy="70" r="11" class="fill-w"/>
+        <path d="M112 81 L112 98 M112 86 L102 92 M112 86 L124 90" class="st-thin"/>
+        <path d="M40 68 L52 68" class="st-hair"/>
+        <text x="40" y="30" class="ts">雨</text>
+      </svg></div>
+      <p class="bubble">可雨最大的时候，<b>总有陌生人愿意把伞挪过来一点</b>。</p>
+      <p class="cap">温柔的一面：善意藏在细节里</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="两条路的路口">
+        <path d="M80 100 L80 60" class="st"/>
+        <path d="M80 60 C60 42 40 36 20 32" class="st-thin" stroke-dasharray="5 5"/>
+        <path d="M80 60 C104 46 126 42 144 40" class="st" marker-end="url(#ar)"/>
+        <circle cx="80" cy="52" r="9" class="fill-y"/>
+        <text x="28" y="24" class="ts">退</text>
+        <text x="130" y="30" class="ty">进</text>
+        <path d="M30 100 L130 100" class="st-hair"/>
+      </svg></div>
+      <p class="bubble">看清两面之后还能选「进」的人，<b>才真的读懂了这本书的书名</b>。</p>
+      <p class="cap">序言给全书定下的基调</p>
+    </figure>
+  </div>
+
+  <h3 class="block">要点 · 这一篇在说什么</h3>
+  <div class="chips">
+    <div class="chip"><b>定调<i>01</i></b><span>不卖惨、不喊口号，如实写下竞争与善意并存的世界。</span></div>
+    <div class="chip"><b>视角<i>02</i></b><span>由朋友执笔，侧面呈现一个比标签更具体的人。</span></div>
+    <div class="chip"><b>态度<i>03</i></b><span>残酷不必美化，温柔不必怀疑，两样都收下。</span></div>
+    <div class="chip"><b>铺垫<i>04</i></b><span>为后文「主动选择」的主题搭好情绪地基。</span></div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>世界从不承诺公平，但它对「往前走」的人一向慷慨。</p>
+    <cite>—— 要点转述 · 非原文</cite>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#pre2">序2 · 没想到你是这样的狮子座 →</a>
+  </div>
+</section>
+
+<!-- ================= 推荐序 2 ================= -->
+<section id="pre2">
+  <div class="ch-head">
+    <div class="ch-no">序2</div>
+    <div>
+      <p class="part">FOREWORD · 推荐序二</p>
+      <h2>没想到你是这样的狮子座</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>第二篇推荐序讲的是<b>反差</b>：外界给作者贴的标签（年轻、张扬、话题人物）和相处中见到的那个人（认真、好学、对自己狠）之间，隔着一整个误解的距离。</p>
+    <p>这一篇的潜台词值得记住：<b>不要让标签替你认识一个人，也不要让标签替你认识自己</b>。别人怎么定义你不重要，你每天在做什么才重要。</p>
+  </div>
+
+  <h3 class="block">连环画 · 标签与真人</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="众人眼中的标签剪影">
+        <circle cx="80" cy="52" r="22" class="fill-r"/>
+        <path d="M80 74 L80 96 M80 80 L62 90 M80 80 L98 90" class="st"/>
+        <text x="80" y="58" class="t" text-anchor="middle">？</text>
+        <path d="M28 30 L44 30 M116 30 L132 30 M26 88 L42 88 M118 88 L134 88" class="st-hair"/>
+        <text x="30" y="24" class="ts">标签A</text>
+        <text x="112" y="24" class="ts">标签B</text>
+        <text x="24" y="102" class="ts">标签C</text>
+      </svg></div>
+      <p class="bubble">远看是一串<b>标签</b>：年轻、张扬、争议……</p>
+      <p class="cap">第一印象：被形容词包围</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="灯下读书做笔记的人">
+        <rect x="30" y="70" width="100" height="10" rx="3" class="fill-s"/>
+        <path d="M52 70 L52 88 M108 70 L108 88" class="st-thin"/>
+        <rect x="58" y="56" width="44" height="14" rx="2" class="fill-w"/>
+        <path d="M80 56 L80 70" class="st-hair"/>
+        <circle cx="80" cy="34" r="11" class="fill-y"/>
+        <path d="M80 45 L80 56" class="st"/>
+        <path d="M120 22 L108 40 L132 40 Z" class="fill-y"/>
+        <path d="M116 40 L116 48 M124 40 L124 48" class="st-hair"/>
+      </svg></div>
+      <p class="bubble">近看是灯下一个<b>反复改稿、认真做功课</b>的人。</p>
+      <p class="cap">相处之后：细节见真章</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="撕掉标签露出真实的太阳">
+        <circle cx="80" cy="56" r="24" class="fill-y"/>
+        <path d="M80 22 L80 32 M80 80 L80 90 M46 56 L56 56 M104 56 L114 56 M56 32 L63 39 M104 32 L97 39 M56 80 L63 73 M104 80 L97 73" class="st-thin"/>
+        <text x="80" y="62" class="t" text-anchor="middle">真</text>
+      </svg></div>
+      <p class="bubble">撕掉形容词，剩下的才是<b>值得学的部分</b>。</p>
+      <p class="cap">这一篇的落点：看人看行动</p>
+    </figure>
+  </div>
+
+  <h3 class="block">要点 · 这一篇在说什么</h3>
+  <div class="chips">
+    <div class="chip"><b>反差<i>01</i></b><span>舆论形象与真实相处之间的落差，是序言的主线。</span></div>
+    <div class="chip"><b>认真<i>02</i></b><span>把每一件小事做到位，是最容易被外人忽略的竞争力。</span></div>
+    <div class="chip"><b>自知<i>03</i></b><span>不被捧杀也不被棒杀，清醒地知道自己要什么。</span></div>
+    <div class="chip"><b>启示<i>04</i></b><span>对读者：别用标签认识别人，更别用标签限制自己。</span></div>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#pre3">序3 · 例外的人 →</a>
+  </div>
+</section>
+
+<!-- ================= 推荐序 3 ================= -->
+<section id="pre3">
+  <div class="ch-head">
+    <div class="ch-no">序3</div>
+    <div>
+      <p class="part">FOREWORD · 推荐序三</p>
+      <h2>例外的人</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>第三篇推荐序提出了全书最关键的一个词：<b>例外</b>。为什么有人能从既定轨道里跳出来？序言的回答不是天赋，而是<b>一次次「不随大流」的选择叠加起来的复利</b>。</p>
+    <p>「例外」不是标新立异，而是<b>在别人将就的地方较真，在别人观望的地方先走一步</b>。这一篇为后面「主动选择」一章埋好了引线。</p>
+  </div>
+
+  <h3 class="block">连环画 · 例外是怎么发生的</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="一群相同方向行走的人">
+        <path d="M16 96 L144 96" class="st-hair"/>
+        <g class="st-thin">
+          <circle cx="36" cy="58" r="9" class="fill-s"/><path d="M36 67 L36 86 M36 72 L28 80 M36 72 L44 80"/>
+          <circle cx="68" cy="58" r="9" class="fill-s"/><path d="M68 67 L68 86 M68 72 L60 80 M68 72 L76 80"/>
+          <circle cx="100" cy="58" r="9" class="fill-s"/><path d="M100 67 L100 86 M100 72 L92 80 M100 72 L108 80"/>
+        </g>
+        <path d="M18 40 L142 40" class="st-hair" marker-end="url(#arm)"/>
+      </svg></div>
+      <p class="bubble">大多数人朝着同一个方向走，<b>因为那条路看起来最安全</b>。</p>
+      <p class="cap">常态：随大流的舒适</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="一个人转身走向另一条小路">
+        <path d="M16 96 L144 96" class="st-hair"/>
+        <circle cx="50" cy="58" r="9" class="fill-s"/><path d="M50 67 L50 86" class="st-thin"/>
+        <circle cx="82" cy="58" r="9" class="fill-s"/><path d="M82 67 L82 86" class="st-thin"/>
+        <circle cx="118" cy="52" r="10" class="fill-y"/>
+        <path d="M118 62 L118 82 M118 67 L108 62 M118 67 L128 72" class="st"/>
+        <path d="M112 44 C124 34 134 30 146 28" class="st-thin" stroke-dasharray="4 4"/>
+      </svg></div>
+      <p class="bubble">例外的人只是<b>在某一个路口转了个弯</b>，并且没有回头。</p>
+      <p class="cap">转折：一次不同的选择</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="小选择积累成大差距的阶梯">
+        <path d="M20 96 L44 96 L44 78 L68 78 L68 60 L92 60 L92 42 L116 42 L116 24 L140 24" class="st"/>
+        <circle cx="32" cy="88" r="6" class="fill-b"/>
+        <circle cx="56" cy="70" r="6" class="fill-g"/>
+        <circle cx="80" cy="52" r="6" class="fill-y"/>
+        <circle cx="104" cy="34" r="6" class="fill-r"/>
+        <text x="132" y="18" class="ty">例外</text>
+      </svg></div>
+      <p class="bubble">一个又一个「不将就」，<b>复利成了别人眼中的例外</b>。</p>
+      <p class="cap">结论：例外 = 选择的复利</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 例外的公式</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 220" role="img" aria-label="例外等于微小的不同选择乘以时间的公式图">
+      <rect x="40" y="70" width="150" height="80" rx="10" class="fill-b"/>
+      <text x="115" y="105" class="t" text-anchor="middle">微小的不同</text>
+      <text x="115" y="128" class="ts" text-anchor="middle">比别人多想一步</text>
+      <text x="215" y="118" class="tb">×</text>
+      <rect x="250" y="70" width="150" height="80" rx="10" class="fill-g"/>
+      <text x="325" y="105" class="t" text-anchor="middle">重复的次数</text>
+      <text x="325" y="128" class="ts" text-anchor="middle">坚持足够久</text>
+      <text x="425" y="118" class="tb">×</text>
+      <rect x="460" y="70" width="150" height="80" rx="10" class="fill-y"/>
+      <text x="535" y="105" class="t" text-anchor="middle">时间</text>
+      <text x="535" y="128" class="ts" text-anchor="middle">让复利发酵</text>
+      <text x="635" y="118" class="tb">=</text>
+      <rect x="670" y="60" width="180" height="100" rx="12" class="fill-r"/>
+      <text x="760" y="102" class="tb" text-anchor="middle">例外的人</text>
+      <text x="760" y="128" class="ts" text-anchor="middle">不是天才，是习惯</text>
+    </svg>
+  </div>
+
+  <div class="action">
+    <h4>把「例外」拆成今天能做的事</h4>
+    <ol>
+      <li>今天挑一件「大家都这样」的小事，多较真 10%。</li>
+      <li>记录这次不同的结果——哪怕只是心情变好。</li>
+      <li>重复三十天，再回头看差距从哪里长出来。</li>
+    </ol>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch4">04 · 自序 · 十年之约 →</a>
+  </div>
+</section>
+<!-- ================= 04 自序 ================= -->
+<section id="ch4">
+  <div class="ch-head">
+    <div class="ch-no">04</div>
+    <div>
+      <p class="part">PREFACE · 自序</p>
+      <h2>十年之约</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>自序是一份<b>十年回望</b>：起点并不光鲜——成绩平平、升学受挫，但通过一次次主动的选择（升学、读书、赴美留学、归国创业），路径逐渐改写。<b>所谓「十年之约」，是和未来自己的约定：把人生当作长期项目来经营。</b></p>
+    <p>这一章给出全书的时间观：<b>用十年的尺度看今天，很多纠结会自动消失</b>。短期的输赢放到十年里，往往只是脚注。</p>
+  </div>
+
+  <h3 class="block">连环画 · 十年的四个路口</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="考卷前的少年">
+        <rect x="34" y="30" width="92" height="60" rx="5" class="fill-w"/>
+        <path d="M46 46 L114 46 M46 58 L102 58 M46 70 L90 70" class="st-hair"/>
+        <text x="80" y="42" class="ts">× × ×</text>
+        <circle cx="80" cy="102" r="8" class="fill-b"/>
+      </svg></div>
+      <p class="bubble">起点只是一张<b>不太好看的考卷</b>，不是判决书。</p>
+      <p class="cap">起点 · 成绩平平的少年时代</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="堆成小山的书">
+        <rect x="28" y="80" width="104" height="14" rx="3" class="fill-s"/>
+        <rect x="36" y="64" width="88" height="14" rx="3" class="fill-b"/>
+        <rect x="46" y="48" width="70" height="14" rx="3" class="fill-g"/>
+        <rect x="56" y="32" width="52" height="14" rx="3" class="fill-y"/>
+        <circle cx="126" cy="34" r="10" class="fill-w"/>
+        <text x="126" y="39" class="t" text-anchor="middle">!</text>
+      </svg></div>
+      <p class="bubble">然后是无数个苦读的夜晚——<b>选择用努力兑换门票</b>。</p>
+      <p class="cap">兑换 · 用努力改写升学路径</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="飞越海洋的纸飞机">
+        <path d="M20 90 C50 78 70 70 84 60" class="st-hair" stroke-dasharray="5 5"/>
+        <path d="M84 40 L136 58 L96 66 L88 84 L84 40 Z" class="fill-w"/>
+        <path d="M96 66 L84 60" class="st-hair"/>
+        <path d="M16 96 C46 102 96 102 144 92" class="st-thin"/>
+        <text x="30" y="110" class="ts">海</text>
+      </svg></div>
+      <p class="bubble">再到独自拖着箱子跨过太平洋，<b>把自己扔进更大的世界</b>。</p>
+      <p class="cap">跃迁 · 赴美留学，见更大的样本</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="小火箭从城市起飞">
+        <path d="M24 96 L44 96 L44 78 L64 78 L64 96 L84 96" class="st-thin"/>
+        <path d="M118 24 C132 38 134 58 122 74 L104 74 C94 58 100 36 118 24 Z" class="fill-y"/>
+        <circle cx="116" cy="48" r="7" class="fill-b"/>
+        <path d="M104 74 L96 88 M122 74 L130 88" class="st-thin"/>
+        <path d="M112 82 C110 92 108 98 106 106" class="st-hair"/>
+      </svg></div>
+      <p class="bubble">最后是创业：<b>把自己押在一个相信的未来上</b>。</p>
+      <p class="cap">落点 · 归国创业，签约未来十年</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 十年尺度的复盘表</h3>
+  <div class="chips">
+    <div class="chip"><b>起点<i>Y0</i></b><span>承认起点低，但不接受起点定终身。</span></div>
+    <div class="chip"><b>杠杆<i>Y2</i></b><span>读书与考试是最早的杠杆：成本低，回报长。</span></div>
+    <div class="chip"><b>样本<i>Y5</i></b><span>走出去看世界，才知道人生有多少种解法。</span></div>
+    <div class="chip"><b>下注<i>Y8</i></b><span>选一个长期事业，把时间与信用都投进去。</span></div>
+    <div class="chip"><b>回望<i>Y10</i></b><span>回头看，每个转折都源自一次主动选择。</span></div>
+    <div class="chip"><b>约定<i>∞</i></b><span>与未来的自己续约：继续把人生当项目经营。</span></div>
+  </div>
+
+  <h3 class="block">误区 · 读这一章最容易犯的错</h3>
+  <div class="warn">
+    <h4>别把回望读成鸡汤</h4>
+    <ul>
+      <li>十年故事是<b>复盘</b>，不是模板——照抄别人的路径，通常水土不服。</li>
+      <li>「长期主义」不等于熬：方向不对，十年也只是十年的原地踏步。</li>
+      <li>幸运与时代红利要如实计入，别把运气全部记在努力头上。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch5">05 · 主动选择，才能接近梦想 →</a>
+  </div>
+</section>
+
+<!-- ================= 05 ================= -->
+<section id="ch5">
+  <div class="ch-head">
+    <div class="ch-no">05</div>
+    <div>
+      <p class="part">CHAPTER 05 · 正文</p>
+      <h2>主动选择，才能接近梦想</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>这一章是全书方法论的入口：<b>梦想不是等来的，是一次次主动选择「够」到的</b>。被动接受安排的人生，看上去安全，实际上离梦想最远——因为<b>别人替你选的路，终点是别人的梦想</b>。</p>
+    <p>主动选择的含义很具体：在升学、职业、城市、圈子这些<b>高权重节点</b>上自己拿主意，并为结果负责。选择的质量，决定人生的走向。</p>
+  </div>
+
+  <h3 class="block">连环画 · 两条人生脚本</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="提线木偶">
+        <path d="M40 14 L56 44 M80 10 L80 44 M120 14 L104 44" class="st-hair"/>
+        <rect x="56" y="44" width="48" height="30" rx="6" class="fill-s"/>
+        <circle cx="80" cy="88" r="11" class="fill-b"/>
+        <path d="M80 74 L80 82" class="st-thin"/>
+        <text x="80" y="64" class="ts" text-anchor="middle">安排</text>
+      </svg></div>
+      <p class="bubble">剧本 A：<b>一切都被安排好</b>——安全，但线在别人手里。</p>
+      <p class="cap">被动脚本 · 稳定的天花板</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="自己掌舵的小船">
+        <path d="M28 78 C60 90 104 90 134 76 L124 92 C98 102 60 102 38 92 Z" class="fill-w"/>
+        <path d="M80 76 L80 34" class="st"/>
+        <path d="M80 38 L112 62 L80 62 Z" class="fill-y"/>
+        <circle cx="56" cy="66" r="9" class="fill-y"/>
+        <path d="M18 104 C50 110 110 110 142 100" class="st-thin"/>
+      </svg></div>
+      <p class="bubble">剧本 B：<b>自己掌舵</b>——会摇晃，但航向是自己的。</p>
+      <p class="cap">主动脚本 · 有风险的选择权</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="指向远方的路标">
+        <path d="M80 96 L80 40" class="st"/>
+        <path d="M80 34 L128 34 L120 24 L128 14 L80 14 Z" class="fill-y"/>
+        <path d="M80 56 L36 56 L42 48 L36 40 L80 40 Z" class="fill-w"/>
+        <text x="104" y="30" class="th">梦想</text>
+        <text x="52" y="52" class="ts">将就</text>
+      </svg></div>
+      <p class="bubble">每一次主动选择，都是<b>朝路标的方向挪一小步</b>。</p>
+      <p class="cap">靠近 · 选择即移动</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 高权重节点决策清单</h3>
+  <div class="action">
+    <h4>做选择前问自己四个问题</h4>
+    <ol>
+      <li>这个选择是<b>我选的</b>，还是「大家都这样」？</li>
+      <li>最坏结果是什么？我能不能承受？</li>
+      <li>五年后的我，会怎么评价今天这个决定？</li>
+      <li>如果不选，代价是不是比选错更大？</li>
+    </ol>
+  </div>
+
+  <h3 class="block">要点 · 这一章的四个词</h3>
+  <div class="chips">
+    <div class="chip"><b>主动<i>ACT</i></b><span>拿到选择权，先于拿到结果。</span></div>
+    <div class="chip"><b>节点<i>KEY</i></b><span>升学、职业、城市、伴侣——高权重选择要亲自过问。</span></div>
+    <div class="chip"><b>负责<i>OWN</i></b><span>选了就认，亏了就复盘，不甩锅给时代和父母。</span></div>
+    <div class="chip"><b>靠近<i>MOVE</i></b><span>梦想不是一次性实现的，是被一次次选择「够」到的。</span></div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>被动的人生没有风险，只有天花板。</p>
+    <cite>—— 要点转述 · 非原文</cite>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch6">06 · 做从未来看正确的事 →</a>
+  </div>
+</section>
+
+<!-- ================= 06 ================= -->
+<section id="ch6">
+  <div class="ch-head">
+    <div class="ch-no">06</div>
+    <div>
+      <p class="part">CHAPTER 06 · 正文</p>
+      <h2>做从未来看正确的事</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>这一章给了一副新的眼镜：<b>站在未来回看今天</b>。当下感到舒服的选择，未必通往想去的未来；当下有点难受的选择，可能正是未来的入场券。<b>判断标准从来不是「现在爽不爽」，而是「未来要不要」。</b></p>
+    <p>未来视角还有一个副产品：<b>焦虑会变小</b>。因为拉长时间看，很多眼前的得失根本不值得占据情绪。</p>
+  </div>
+
+  <h3 class="block">连环画 · 两种眼镜</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="戴着当下眼镜看眼前的甜头">
+        <circle cx="60" cy="52" r="14" class="fill-w"/>
+        <circle cx="98" cy="52" r="14" class="fill-w"/>
+        <path d="M74 52 L84 52 M46 52 L30 48 M112 52 L128 48" class="st-thin"/>
+        <path d="M72 82 L86 82 L79 104 Z" class="fill-s"/>
+        <circle cx="79" cy="78" r="9" class="fill-r"/>
+        <text x="80" y="20" class="ts">只看得见眼前的甜</text>
+      </svg></div>
+      <p class="bubble">「当下眼镜」：只看见<b>眼前的甜与眼前的难</b>。</p>
+      <p class="cap">短视 · 被即时感受牵着走</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="用望远镜看向未来的山峰">
+        <path d="M22 92 L64 40 L96 82 L114 60 L142 92 Z" class="fill-b"/>
+        <rect x="26" y="60" width="44" height="18" rx="6" class="fill-y" transform="rotate(-18 48 69)"/>
+        <circle cx="82" cy="64" r="10" class="fill-w"/>
+        <path d="M124 30 L132 22" class="st-hair"/>
+        <text x="118" y="18" class="ty">未来</text>
+      </svg></div>
+      <p class="bubble">「未来眼镜」：<b>先看五年后的目标，再回推今天该做什么</b>。</p>
+      <p class="cap">远视 · 以终为始</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="倒推的多米诺骨牌">
+        <rect x="120" y="42" width="12" height="40" rx="2" class="fill-y"/>
+        <rect x="96" y="52" width="10" height="30" rx="2" class="fill-g"/>
+        <rect x="74" y="60" width="9" height="22" rx="2" class="fill-b"/>
+        <rect x="54" y="66" width="8" height="16" rx="2" class="fill-r"/>
+        <path d="M40 82 L24 82" class="st-thin" marker-end="url(#arm)"/>
+        <text x="36" y="72" class="ts">今天</text>
+        <text x="126" y="34" class="th">五年后</text>
+      </svg></div>
+      <p class="bubble">从目标<b>倒推</b>：要走到终点，今天必须先推倒哪一张牌？</p>
+      <p class="cap">倒推 · 把未来拆成今天</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 未来视角的三步倒推法</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 240" role="img" aria-label="从五年目标倒推到本周行动的三步图">
+      <rect x="560" y="60" width="240" height="110" rx="14" class="fill-y"/>
+      <text x="680" y="105" class="tb" text-anchor="middle">五年后我想成为的样子</text>
+      <text x="680" y="135" class="ts" text-anchor="middle">先写下来，越具体越好</text>
+      <rect x="310" y="60" width="210" height="110" rx="14" class="fill-g"/>
+      <text x="415" y="105" class="tb" text-anchor="middle">今年的关键一步</text>
+      <text x="415" y="135" class="ts" text-anchor="middle">只挑一件事</text>
+      <rect x="60" y="60" width="210" height="110" rx="14" class="fill-b"/>
+      <text x="165" y="105" class="tb" text-anchor="middle">本周能做的动作</text>
+      <text x="165" y="135" class="ts" text-anchor="middle">小到不可能失败</text>
+      <path d="M545 115 L530 115" class="st" marker-end="url(#ar)"/>
+      <path d="M295 115 L280 115" class="st" marker-end="url(#ar)"/>
+      <text x="680" y="205" class="ts" text-anchor="middle">← 倒推：未来决定今天，而不是今天绑架未来</text>
+    </svg>
+  </div>
+
+  <div class="warn">
+    <h4>未来视角的两个坑</h4>
+    <ul>
+      <li>别用「未来」合理化一切眼前的苦：<b>方向错的坚持不是长期主义</b>。</li>
+      <li>别把五年目标定成枷锁：未来是用来校准的，不是用来惩罚今天的。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch7">07 · All in 一个波澜壮阔的事业 →</a>
+  </div>
+</section>
+<!-- ================= 07 ================= -->
+<section id="ch7">
+  <div class="ch-head">
+    <div class="ch-no">07</div>
+    <div>
+      <p class="part">CHAPTER 07 · 正文</p>
+      <h2>All in 一个波澜壮阔的事业</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>这一章讲<b>下注</b>：人生真正拉开差距的时刻，不是努力的总量，而是<b>敢不敢把资源集中投进一个大趋势里</b>。分散的平庸努力，很难换来跃迁；认准方向后的全力投入，才有复利。</p>
+    <p>但 All in 不是赌博。书里的逻辑是：<b>先用研究与小试验证判断，再决定押多大的注</b>。勇气来自准备，而不是来自无知。</p>
+  </div>
+
+  <h3 class="block">连环画 · 从看到到押注</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="山顶用望远镜看趋势">
+        <path d="M16 96 L58 44 L100 96 Z" class="fill-b"/>
+        <circle cx="58" cy="38" r="9" class="fill-y"/>
+        <rect x="62" y="30" width="30" height="10" rx="4" class="fill-w" transform="rotate(-12 77 35)"/>
+        <path d="M110 30 L140 30 M110 46 L140 46 M110 62 L140 62" class="st-hair"/>
+        <text x="122" y="24" class="ts">趋势线</text>
+      </svg></div>
+      <p class="bubble">第一步：<b>看见大多数人还没看见的趋势</b>。</p>
+      <p class="cap">判断 · 用研究代替跟风</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="小筹码试水">
+        <ellipse cx="46" cy="82" rx="18" ry="8" class="fill-g"/>
+        <ellipse cx="46" cy="72" rx="18" ry="8" class="fill-g"/>
+        <ellipse cx="96" cy="82" rx="18" ry="8" class="fill-b"/>
+        <path d="M124 40 L136 40 M130 34 L130 46" class="st-thin"/>
+        <circle cx="130" cy="40" r="12" class="fill-w"/>
+        <text x="60" y="36" class="ts">先小试 →</text>
+      </svg></div>
+      <p class="bubble">第二步：<b>用小筹码验证判断</b>，错了就交学费，对了就加注。</p>
+      <p class="cap">验证 · 小成本试错</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="把全部筹码推向前方">
+        <rect x="24" y="64" width="112" height="30" rx="8" class="fill-s"/>
+        <ellipse cx="52" cy="52" rx="15" ry="7" class="fill-y"/>
+        <ellipse cx="52" cy="42" rx="15" ry="7" class="fill-y"/>
+        <ellipse cx="52" cy="32" rx="15" ry="7" class="fill-y"/>
+        <path d="M80 42 L128 42" class="st" marker-end="url(#ar)"/>
+        <text x="104" y="32" class="ty">All in</text>
+      </svg></div>
+      <p class="bubble">第三步：判断被验证后，<b>把时间、信用与资源全部推进去</b>。</p>
+      <p class="cap">下注 · 集中投入一个大事业</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="攀岩者向上攀登">
+        <path d="M30 100 L60 60 L84 76 L116 24 L144 24" class="st"/>
+        <circle cx="76" cy="52" r="9" class="fill-y"/>
+        <path d="M76 61 L76 78 M76 66 L66 60 M76 66 L88 70 M76 78 L68 90 M76 78 L86 88" class="st-thin"/>
+        <text x="118" y="18" class="th">事业的陡坡</text>
+      </svg></div>
+      <p class="bubble">然后是漫长的爬坡——<b>波澜壮阔是回头看才看见的</b>。</p>
+      <p class="cap">执行 · 用日常兑现下注</p>
+    </figure>
+  </div>
+
+  <h3 class="block">要点 · All in 的正确姿势</h3>
+  <div class="chips">
+    <div class="chip"><b>先看<i>01</i></b><span>大趋势要自己研究，不听二手故事。</span></div>
+    <div class="chip"><b>先试<i>02</i></b><span>小成本验证，把学费控制在交得起的范围。</span></div>
+    <div class="chip"><b>再押<i>03</i></b><span>验证后集中投入，摊大饼式的努力最费人。</span></div>
+    <div class="chip"><b>底线<i>04</i></b><span>永远留好退路：All in 的是注意力，不是身家性命。</span></div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>真正的勇气，是准备好了才敢下的注。</p>
+    <cite>—— 要点转述 · 非原文</cite>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch8">08 ·「90后」新文明宣言 →</a>
+  </div>
+</section>
+
+<!-- ================= 08 ================= -->
+<section id="ch8">
+  <div class="ch-head">
+    <div class="ch-no">08</div>
+    <div>
+      <p class="part">CHAPTER 08 · 正文</p>
+      <h2>「90后」新文明宣言</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>这一章把镜头从个人拉到<b>一代人</b>：互联网原住民这一代，天然拥有前人没有的工具——表达的渠道、低成本的协作、全球化的视野。<b>个人从未像今天这样，可以不依附于单一组织而活。</b></p>
+    <p>所谓「新文明宣言」，核心是三件事：<b>个体崛起、多元价值、对旧脚本的修正</b>。它不是叛逆，而是把人生的所有权拿回自己手里。</p>
+  </div>
+
+  <h3 class="block">连环画 · 旧脚本与新脚本</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="一排流水线上的齿轮">
+        <circle cx="40" cy="58" r="16" class="fill-s"/><circle cx="40" cy="58" r="5" class="fill-w"/>
+        <circle cx="80" cy="58" r="16" class="fill-s"/><circle cx="80" cy="58" r="5" class="fill-w"/>
+        <circle cx="120" cy="58" r="16" class="fill-s"/><circle cx="120" cy="58" r="5" class="fill-w"/>
+        <text x="80" y="100" class="ts" text-anchor="middle">同一个模子：读书 → 工作 → 房子 → 退休</text>
+      </svg></div>
+      <p class="bubble">旧脚本：<b>人生像流水线</b>，每个环节都有标准答案。</p>
+      <p class="cap">传统路径 · 稳定但同质</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="多方向发散的箭头">
+        <circle cx="80" cy="58" r="12" class="fill-y"/>
+        <path d="M80 46 L80 22 M80 70 L80 94 M68 58 L36 58 M92 58 L124 58 M71 49 L48 30 M89 49 L112 30 M71 67 L48 86 M89 67 L112 86" class="st-thin" marker-end="url(#arm)"/>
+        <text x="80" y="14" class="ts">写作</text>
+        <text x="128" y="62" class="ts">创业</text>
+        <text x="20" y="62" class="ts">游学</text>
+        <text x="98" y="102" class="ts">创作</text>
+      </svg></div>
+      <p class="bubble">新脚本：<b>人生是发散的</b>，一个人可以有很多种活法。</p>
+      <p class="cap">多元价值 · 自定义成功</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="手机发出的信号波">
+        <rect x="62" y="34" width="36" height="58" rx="6" class="fill-w"/>
+        <rect x="68" y="42" width="24" height="36" rx="2" class="fill-b"/>
+        <path d="M108 40 C118 48 118 68 108 76 M120 30 C136 44 136 72 120 86" class="st-thin"/>
+        <path d="M52 40 C42 48 42 68 52 76 M40 30 C24 44 24 72 40 86" class="st-thin"/>
+        <text x="80" y="108" class="ts" text-anchor="middle">一个人也能被世界听见</text>
+      </svg></div>
+      <p class="bubble">工具变了：<b>一部手机就是一间公司</b>，个体第一次可以直连世界。</p>
+      <p class="cap">个体崛起 · 工具即杠杆</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="接力棒交到年轻人手上">
+        <circle cx="48" cy="50" r="10" class="fill-s"/><path d="M48 60 L48 84 M48 66 L62 72" class="st-thin"/>
+        <circle cx="112" cy="50" r="10" class="fill-y"/><path d="M112 60 L112 84 M112 66 L98 72" class="st-thin"/>
+        <rect x="70" y="66" width="22" height="8" rx="4" class="fill-r" transform="rotate(-14 81 70)"/>
+        <text x="80" y="106" class="ts" text-anchor="middle">话语权的交接正在进行</text>
+      </svg></div>
+      <p class="bubble">而每一代人都会<b>把世界往前挪一点点</b>——轮到这一代了。</p>
+      <p class="cap">代际更替 · 责任的接力</p>
+    </figure>
+  </div>
+
+  <h3 class="block">图解 · 传统脚本 vs 新脚本</h3>
+  <div class="figure">
+    <svg viewBox="0 0 900 320" role="img" aria-label="传统人生脚本与新人生脚本的对照表">
+      <rect x="40" y="30" width="380" height="260" rx="12" class="fill-w" stroke-dasharray="8 6"/>
+      <text x="230" y="62" class="tb" text-anchor="middle">旧脚本</text>
+      <path d="M70 90 L400 90 M70 140 L400 140 M70 190 L400 190 M70 240 L400 240" class="st-hair"/>
+      <text x="80" y="122" class="t">稳定工作 + 一条道走到黑</text>
+      <text x="80" y="172" class="t">成功 = 房子 + 车子 + 编制</text>
+      <text x="80" y="222" class="t">人生由别人安排</text>
+      <text x="80" y="272" class="t">价值由职位与收入定义</text>
+
+      <rect x="480" y="30" width="380" height="260" rx="12" class="fill-g"/>
+      <text x="670" y="62" class="tb" text-anchor="middle">新脚本</text>
+      <path d="M510 90 L830 90 M510 140 L830 140 M510 190 L830 190 M510 240 L830 240" class="st-hair"/>
+      <text x="520" y="122" class="t">多重身份 + 终身学习</text>
+      <text x="520" y="172" class="t">成功 = 自定义，不接受默认值</text>
+      <text x="520" y="222" class="t">人生自己拿主意</text>
+      <text x="520" y="272" class="t">价值由创造与影响力定义</text>
+    </svg>
+  </div>
+
+  <div class="action">
+    <h4>今天就能开始的「个人崛起」</h4>
+    <ol>
+      <li>选一个你愿意持续输出的领域，<b>先公开发表十次</b>。</li>
+      <li>把「我会什么」写成清单，找出可以产品化的一项。</li>
+      <li>用一个最小作品去换真实反馈，而不是憋大招。</li>
+    </ol>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch9">09 · 我在财富自由的路上等着你 →</a>
+  </div>
+</section>
+
+<!-- ================= 09 ================= -->
+<section id="ch9">
+  <div class="ch-head">
+    <div class="ch-no">09</div>
+    <div>
+      <p class="part">CHAPTER 09 · 正文</p>
+      <h2>我在财富自由的路上等着你</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>这一章聊钱，但立场很清醒：<b>财富自由是手段，不是终点</b>。钱真正的意义是买回选择权——让你可以拒绝不想做的事，去做真正想做的事。</p>
+    <p>书里反复强调的一点值得单独记住：<b>合法地赚钱、创造价值，本身就是一种善良</b>。赚钱与道德不必对立；靠提供价值获得回报，是世界给努力者最温柔的回应方式。</p>
+  </div>
+
+  <h3 class="block">连环画 · 钱的三副面孔</h3>
+  <div class="comic">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="被账单追着跑的人">
+        <circle cx="52" cy="52" r="11" class="fill-b"/>
+        <path d="M52 63 L52 84 M52 68 L40 60 M52 68 L66 74 M52 84 L42 96 M52 84 L62 96" class="st-thin"/>
+        <rect x="92" y="34" width="36" height="24" rx="3" class="fill-w"/>
+        <text x="110" y="50" class="ts" text-anchor="middle">账单</text>
+        <rect x="102" y="66" width="36" height="24" rx="3" class="fill-w"/>
+        <text x="120" y="82" class="ts" text-anchor="middle">贷款</text>
+        <path d="M88 56 L70 56" class="st-thin" marker-end="url(#arm)"/>
+      </svg></div>
+      <p class="bubble">面孔一：<b>如果只是追逐，钱就是永远追不上的账单</b>。</p>
+      <p class="cap">匮乏 · 钱当主人</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="钱变成会下蛋的鹅">
+        <ellipse cx="80" cy="72" rx="30" ry="22" class="fill-y"/>
+        <circle cx="104" cy="52" r="10" class="fill-y"/>
+        <path d="M112 50 L122 46" class="st-thin"/>
+        <ellipse cx="52" cy="92" rx="8" ry="6" class="fill-w"/>
+        <ellipse cx="72" cy="98" rx="8" ry="6" class="fill-w"/>
+        <text x="80" y="30" class="ts" text-anchor="middle">资产 = 会下蛋的鹅</text>
+      </svg></div>
+      <p class="bubble">面孔二：<b>当钱变成资产，它就开始替你工作</b>。</p>
+      <p class="cap">积累 · 钱当员工</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="用钥匙打开一扇门">
+        <rect x="88" y="26" width="48" height="70" rx="4" class="fill-g"/>
+        <circle cx="100" cy="62" r="3" class="fill-w"/>
+        <circle cx="42" cy="52" r="12" class="fill-w"/>
+        <path d="M52 58 L84 58 M72 58 L72 68 M80 58 L80 66" class="st"/>
+        <text x="42" y="57" class="ts" text-anchor="middle">选</text>
+        <text x="112" y="110" class="ts" text-anchor="middle">选择权之门</text>
+      </svg></div>
+      <p class="bubble">面孔三：<b>钱最终买到的是「说不」的底气和「说好」的自由</b>。</p>
+      <p class="cap">自由 · 钱当钥匙</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="双手捧起一颗心">
+        <path d="M40 84 C24 68 30 48 46 50 C54 40 72 42 76 52 C82 42 98 42 106 52 C122 50 128 70 112 84 L76 104 Z" class="fill-r"/>
+        <path d="M44 96 C36 102 30 104 22 104 M108 96 C116 102 122 104 130 104" class="st-thin"/>
+        <text x="76" y="28" class="ts" text-anchor="middle">创造价值 → 获得回报 → 传递出去</text>
+      </svg></div>
+      <p class="bubble">别忘了第四面：<b>靠创造价值赚来的钱，带着善意的温度</b>。</p>
+      <p class="cap">善良 · 赚钱也可以是正和游戏</p>
+    </figure>
+  </div>
+
+  <h3 class="block">要点 · 关于财富自由的四个认知</h3>
+  <div class="chips">
+    <div class="chip"><b>定义<i>01</i></b><span>不是「花不完」，是被动收入覆盖想要的生活。</span></div>
+    <div class="chip"><b>路径<i>02</i></b><span>先投资自己，再投资资产——自己是最早期的优质资产。</span></div>
+    <div class="chip"><b>心态<i>03</i></b><span>合法赚钱不可耻，创造价值本身就是善良。</span></div>
+    <div class="chip"><b>终点<i>04</i></b><span>自由之后要回答「然后呢」——钱服务于意义。</span></div>
+  </div>
+
+  <div class="warn">
+    <h4>关于钱的两个提醒</h4>
+    <ul>
+      <li>先保住生存线，再去谈理想：<b>财务安全是一切选择的地基</b>。</li>
+      <li>任何承诺「快速致富」的东西，先假设它是骗局，再慢慢验证。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#ch10">10 · 附录 · 粉丝问答 →</a>
+  </div>
+</section>
+
+<!-- ================= 10 附录 ================= -->
+<section id="ch10">
+  <div class="ch-head">
+    <div class="ch-no">10</div>
+    <div>
+      <p class="part">APPENDIX · 附录</p>
+      <h2>粉丝问答</h2>
+    </div>
+  </div>
+
+  <div class="idea">
+    <h3>中心思想</h3>
+    <p>附录是全书最接地气的部分：<b>真实的困惑，直接的回答</b>。问题集中在几类——学历与起点、职业选择、要不要创业、如何理财、如何面对质疑。答案虽然各异，但内核与正文一致：<b>主动选择、长期视角、自己负责</b>。</p>
+  </div>
+
+  <h3 class="block">连环画 · 四个被问最多的问题</h3>
+  <div class="comic two">
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="起点低的人站在小石头上">
+        <path d="M20 96 L60 96 L60 72 L100 72 L100 48 L140 48" class="st"/>
+        <circle cx="126" cy="36" r="9" class="fill-y"/>
+        <path d="M126 45 L126 62 M126 50 L116 44 M126 50 L136 46" class="st-thin"/>
+        <text x="36" y="112" class="ts">起点</text>
+      </svg></div>
+      <p class="bubble"><b>Q：起点低还有救吗？</b><br/>A：起点决定起跑线，不决定终点线。把注意力从「我没有什么」移到「我能做什么」。</p>
+      <p class="cap">问答一 · 关于起点</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="两扇门的选择">
+        <rect x="26" y="34" width="40" height="62" rx="4" class="fill-b"/>
+        <rect x="94" y="34" width="40" height="62" rx="4" class="fill-g"/>
+        <circle cx="58" cy="66" r="3" class="fill-w"/>
+        <circle cx="126" cy="66" r="3" class="fill-w"/>
+        <path d="M80 100 L80 88" class="st-thin"/>
+        <text x="46" y="26" class="ts">稳定</text>
+        <text x="114" y="26" class="ts">冒险</text>
+      </svg></div>
+      <p class="bubble"><b>Q：稳定的工作还要不要辞？</b><br/>A：先别急着辞。用业余时间验证你的 B 计划，等它有收入雏形再切换。</p>
+      <p class="cap">问答二 · 关于职业</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="学习的雪球越滚越大">
+        <circle cx="50" cy="82" r="12" class="fill-b"/>
+        <circle cx="86" cy="70" r="20" class="fill-g"/>
+        <circle cx="132" cy="52" r="30" class="fill-y"/>
+        <path d="M24 100 L152 100" class="st-hair"/>
+      </svg></div>
+      <p class="bubble"><b>Q：学的东西总感觉没用怎么办？</b><br/>A：知识的复利有滞后性。今天读的书，可能两年后才突然派上用场。</p>
+      <p class="cap">问答三 · 关于学习</p>
+    </figure>
+    <figure class="panel">
+      <div class="scene"><svg viewBox="0 0 160 116" role="img" aria-label="举着伞挡开质疑的雨点">
+        <path d="M36 60 C36 40 60 28 80 28 C100 28 124 40 124 60" class="fill-y"/>
+        <path d="M80 28 L80 18" class="st"/>
+        <circle cx="80" cy="76" r="9" class="fill-w"/>
+        <path d="M80 85 L80 100 M80 88 L68 94 M80 88 L92 94" class="st-thin"/>
+        <path d="M28 74 L28 80 M44 84 L44 90 M116 84 L116 90 M132 74 L132 80" class="st-hair"/>
+      </svg></div>
+      <p class="bubble"><b>Q：别人质疑我的选择怎么办？</b><br/>A：解释成本很高，结果最会说话。把质疑当成天气，撑好伞继续走。</p>
+      <p class="cap">问答四 · 关于质疑</p>
+    </figure>
+  </div>
+
+  <h3 class="block">章末小结 · 全书五句话带走</h3>
+  <div class="chips">
+    <div class="chip"><b>01<i>选</i></b><span>人生是选择的总和，主动选，别让别人替你选。</span></div>
+    <div class="chip"><b>02<i>远</i></b><span>用五年后的眼光评估今天的决定。</span></div>
+    <div class="chip"><b>03<i>注</i></b><span>认准大趋势后，敢于集中投入。</span></div>
+    <div class="chip"><b>04<i>值</i></b><span>先创造价值，财富是价值的影子。</span></div>
+    <div class="chip"><b>05<i>爱</i></b><span>残酷是世界的底色，温柔是我们的选择。</span></div>
+    <div class="chip"><b>∞<i>行</i></b><span>知道不做的等于不知道——今天就开始。</span></div>
+  </div>
+
+  <div class="quote">
+    <div class="mark">“</div>
+    <p>愿你被这世界温柔以待，也愿你有勇气温柔地对待这个世界。</p>
+    <cite>—— 合上书时的一句祝愿 · 要点转述</cite>
+  </div>
+
+  <div class="pager">
+    <a class="up" href="#top">⬆ 封面</a>
+    <a href="#core">★ 回到全书核心观念</a>
+  </div>
+</section>
+
+<footer>
+  <p>《这世界既残酷也温柔》手绘连环画 · 一章一世界 · 样式复刻自《富爸爸穷爸爸》手绘笔记模板。</p>
+  <p>⚠️ 本页为<b>读书笔记式再创作</b>：全部文字均为要点转述与原创手绘图解，并非原书摘录；如需引用原文，请以正版纸质书为准。</p>
+</footer>
+
+</main>
+</div>
+</body>
+</html>
